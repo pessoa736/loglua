@@ -1,9 +1,8 @@
 # esse dockerfile é só para rodar os scripts para test
-FROM nickblah/lua:5.4.7
+FROM nickblah/lua:5.4-noble
 
-RUN mkdir /log_lib
 
-COPY ./src /logs_lib/src
-COPY ./test /log_lib/test
+COPY ./src /src
+COPY ./test /test
 
-WORKDIR /log_lib
+WORKDIR /src
