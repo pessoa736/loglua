@@ -80,7 +80,7 @@ Notes:
 
 ## Compatibility
 
-- Lua >= 5.4 (uses to-be-closed variables, introduced in Lua 5.4)
+- Lua >= 5.4 
 
 ## Development
 
