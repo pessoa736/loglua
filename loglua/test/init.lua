@@ -14,15 +14,20 @@ soma = function(...)
     return res
 end
 
-n1 = 2
-n2 = 5
+local n1 = 2
+local n2 = 5
 log(n1, n2)
 
-s = soma(n1, n2)
+local s = soma(n1, n2)
 log(s)
+
+log.debug("debug message")
+log("a")
 
 log.error("erro test")
 
+log.show()
+log.activateDebubMode()
 log.show()
 
 log.save("./")

@@ -1,98 +1,98 @@
 # loglua
 
-Um helper de logging minimalista em Lua para acumular mensagens em memória, exibi-las no console e salvá-las em arquivo com um cabeçalho de data/hora.
+Minimalistic logging helper for Lua: collect messages in-memory, print them to the console, and append them to a file with a timestamped header.
 
-## Instalação
+## Installation
 
-Você pode instalar localmente via LuaRocks a partir do rockspec incluso no repositório:
+Install locally via LuaRocks using the rockspec included in this repository:
 
 ```bash
-luarocks make rockspecs/loglua-1.0-1.rockspec
+luarocks make rockspecs/loglua-1.0-3.rockspec
 ```
 
-Após instalar, importe o módulo com:
+Then require the module in your code:
 
 ```lua
 local log = require("loglua")
 ```
 
-Durante o desenvolvimento (sem instalar), carregue diretamente a pasta do projeto ajustando `package.path`:
+During development (without installing), load the project folder directly by tweaking `package.path`:
 
 ```lua
 package.path = "loglua/?.lua;" .. package.path
 local log = require("loglua")
 ```
 
-## Uso básico
+## Quick start
 
 ```lua
 local log = require("loglua")
 
--- Adiciona mensagens (aceita múltiplos valores)
-log("Iniciando processamento", 123)
-log.add("Usuário:", "davi")
+-- Add messages (accepts multiple values)
+log("Starting process", 123)
+log.add("User:", "davi")
 
--- Mensagem de debug (só aparece se log.debugMode for true)
-log.debug("variável x=", 42)
+-- Debug message (visible/saved only if log.debugMode is true)
+log.debug("x=", 42)
 
--- Registra um erro (incrementa contador interno)
-log.error("falha ao carregar recurso")
+-- Register an error (increments internal counter)
+log.error("failed to load resource")
 
--- Exibe tudo e o total de mensagens/erros
+-- Print everything and totals
 log.show()
 
--- Salva em arquivo. Use: log.save(dir, name)
---   - dir: diretório (pode ser string vazia para diretório atual).
---   - name: nome do arquivo (padrão: "log.txt").
--- Ex.: log.save("/tmp/", "meu_log.txt") ou log.save("", "meu_log.txt")
-log.save("", "meu_log.txt")
+-- Save to a file: log.save(dir, name)
+--   - dir: directory (use empty string for current directory)
+--   - name: filename (default: "log.txt")
+-- Examples: log.save("/tmp/", "my_log.txt") or log.save("", "my_log.txt")
+log.save("", "my_log.txt")
 ```
 
-Saída típica no console ao chamar `show()`:
+Example console output from `show()`:
 
 ```
 -= - = - = - = - = - = - = - = - = - = -
 --	2025-10-26 12:34:56	--
 -= - = - = - = - = - = - = - = - = - = -
 
-[1] Iniciando processamento 123
-[2] Usuário: davi
+[1] Starting process 123
+[2] User: davi
 
 Total prints: 3
-Total erros: 1
+Total errors: 1
 ```
 
 ## API
 
-- `log(...)` / `log.add(...)`: adiciona uma nova mensagem. Aceita múltiplos valores; cada valor é convertido para string e concatenado.
-- `log.debug(...)`: adiciona uma mensagem de debug (gravada/exibida apenas se `log.debugMode = true`).
-- `log.error(...)`: adiciona uma mensagem do tipo `error` e incrementa `log._NErrors`.
-- `log.show()`: imprime um cabeçalho com data/hora e as mensagens acumuladas.
-- `log.save(dir, name)`: escreve as mensagens em arquivo no modo append. Passe `dir` como diretório (pode ser `""`) e `name` o nome do arquivo (padrão: `"log.txt"`).
+- `log(...)` / `log.add(...)`: add a new message. Accepts multiple values; each value is stringified and concatenated.
+- `log.debug(...)`: add a debug message. Displayed/saved only when `log.debugMode = true`.
+- `log.error(...)`: add an error message and increment `log._NErrors`.
+- `log.show()`: print a timestamped header and the accumulated messages.
+- `log.save(dir, name)`: append the messages to a file with a timestamped block header. Pass `dir` (can be `""`) and `name` (default `"log.txt"`).
 
-Observações:
-- As mensagens ficam em memória até você exibir/salvar. Repetir `save` escreverá novamente o mesmo bloco (com novo cabeçalho).
-- Para salvar usando apenas um caminho completo, chame `log.save(dir, name)` com `dir` sendo o diretório (ou `""`) e `name` o nome do arquivo.
+Notes:
+- Messages remain in memory until you print/save them. Calling `save` repeatedly will append the same block again (with a fresh timestamp header).
+- Error entries are counted; by default, only regular `log` messages are displayed/saved, and `debug` messages are included only if `log.debugMode = true`.
 
-## Configurações úteis
+## Configuration
 
-- `log.debugMode` (boolean): quando `true`, mensagens de `log.debug(...)` serão exibidas e gravadas. Por padrão fica desligado até você definir `log.debugMode = true`.
+- `log.debugMode` (boolean): when `true`, `log.debug(...)` messages are printed and saved. Off by default until you set `log.debugMode = true`.
 
-## Compatibilidade
+## Compatibility
 
-- Lua >= 5.1
+- Lua >= 5.4 (uses to-be-closed variables, introduced in Lua 5.4)
 
-## Desenvolvimento
+## Development
 
-- Código-fonte principal: `loglua/init.lua`.
-- Exemplo simples de execução durante o desenvolvimento:
+- Main source file: `loglua/init.lua`.
+- Quick test during development:
 
 ```bash
 lua -e 'package.path="loglua/?.lua;"..package.path; local log=require("loglua"); log("hello"); log.show()'
 ```
 
-- Há um `loglua/test/init.lua` de exemplo; ajuste o `package.path` conforme seu ambiente se necessário.
+- There is a simple example at `loglua/test/init.lua`; adjust `package.path` if needed.
 
-## Licença
+## License
 
-MIT — veja o arquivo `LICENSE`.
+MIT — see `LICENSE`.

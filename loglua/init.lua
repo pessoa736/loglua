@@ -3,6 +3,18 @@ local log = {}
 log = {
     _messages = {},
     _NErrors = 0,
+    _debugMode = false,
+
+    activateDebubMode = function()
+        log._debugMode =true
+    end,
+    deactivateDebubMode = function()
+        log._debugMode = false
+    end,
+    checkDebugMode = function()
+        return log._debugMode
+    end,
+    
     show = function ()
 
         local line = string.rep("-=",21)
@@ -15,7 +27,7 @@ log = {
                 if v.type == "log" then
                     index = index + 1
                     print("[".. index.."]".. v.message)
-                elseif v.type == "debug" and log.debugMode then
+                elseif v.type == "debug" and log.checkDebugMode() then
                     index = index + 1
                     print("[".. index.."]".. "__ " .. v.message)
                 end
@@ -31,7 +43,7 @@ log = {
         local exist = Checkfile ~= nil
         if Checkfile then Checkfile:close() end
 
-        local file = io.open(base, not Checkfile and "w+" or "a+")
+        local file <close> = io.open(base, not Checkfile and "w+" or "a+")
         if not file then
             error("save erro")
         else
@@ -46,7 +58,7 @@ log = {
                 if v.type == "log" then
                     index = index + 1
                     file:write("[".. index.."]".. v.message .. "\n")
-                elseif v.type == "debug" and log.debugMode then
+                elseif v.type == "debug" and log.checkDebugMode() then
                     index = index + 1
                     file:write("[".. index.."]".. "__ " .. v.message .. "\n")
                 end
