@@ -4,65 +4,79 @@ Um helper de logging minimalista em Lua para acumular mensagens em memória, exi
 
 ## Instalação
 
-Você pode usar o módulo de duas formas: instalando via LuaRocks (recomendado) ou carregando diretamente do diretório `src/` durante o desenvolvimento.
-
-### Via LuaRocks (local a partir do repositório)
-
-Instale a partir do rockspec incluso no repositório:
+Você pode instalar localmente via LuaRocks a partir do rockspec incluso no repositório:
 
 ```bash
 luarocks make rockspecs/loglua-1.0-1.rockspec
 ```
 
-Após instalar, importe com:
+Após instalar, importe o módulo com:
 
 ```lua
 local log = require("loglua")
 ```
 
-### Usando diretamente do `src/` (sem instalar)
-
-Adicione `src/` ao `package.path` e carregue o arquivo do módulo:
+Durante o desenvolvimento (sem instalar), carregue diretamente a pasta do projeto ajustando `package.path`:
 
 ```lua
-package.path = "src/?.lua;" .. package.path
-local log = require("log")
+package.path = "loglua/?.lua;" .. package.path
+local log = require("loglua")
 ```
 
 ## Uso básico
 
 ```lua
-local log = require("loglua") -- ou, durante dev: require("log")
+local log = require("loglua")
 
 -- Adiciona mensagens (aceita múltiplos valores)
 log("Iniciando processamento", 123)
-log("Usuário:", "davi")
+log.add("Usuário:", "davi")
 
--- Exibe tudo e o total de mensagens
+-- Mensagem de debug (só aparece se log.debugMode for true)
+log.debug("variável x=", 42)
+
+-- Registra um erro (incrementa contador interno)
+log.error("falha ao carregar recurso")
+
+-- Exibe tudo e o total de mensagens/erros
 log.show()
 
--- Salva em arquivo (acrescenta no final e inclui um cabeçalho com data/hora)
-log.save("meu_log.txt")
+-- Salva em arquivo. Use: log.save(dir, name)
+--   - dir: diretório (pode ser string vazia para diretório atual).
+--   - name: nome do arquivo (padrão: "log.txt").
+-- Ex.: log.save("/tmp/", "meu_log.txt") ou log.save("", "meu_log.txt")
+log.save("", "meu_log.txt")
 ```
 
 Saída típica no console ao chamar `show()`:
 
 ```
-[ 0 ] Iniciando processamento 123
-[ 1 ] Usuário: davi
-Total messages: 2
+-= - = - = - = - = - = - = - = - = - = -
+--	2025-10-26 12:34:56	--
+-= - = - = - = - = - = - = - = - = - = -
+
+[1] Iniciando processamento 123
+[2] Usuário: davi
+
+Total prints: 3
+Total erros: 1
 ```
 
 ## API
 
-- `log(...)` (alias de `log.add(...)`): adiciona uma nova mensagem. Qualquer valor é convertido para string.
-- `log.add(...)`: mesmo comportamento de `log(...)`.
-- `log.show()`: imprime as mensagens acumuladas, na ordem, e o total ao fim.
-- `log.save(path)`: abre (modo append) o arquivo `path` e escreve todas as mensagens, precedidas por um cabeçalho com `os.date()` na primeira linha do bloco.
+- `log(...)` / `log.add(...)`: adiciona uma nova mensagem. Aceita múltiplos valores; cada valor é convertido para string e concatenado.
+- `log.debug(...)`: adiciona uma mensagem de debug (gravada/exibida apenas se `log.debugMode = true`).
+- `log.error(...)`: adiciona uma mensagem do tipo `error` e incrementa `log._NErrors`.
+- `log.show()`: imprime um cabeçalho com data/hora e as mensagens acumuladas.
+- `log.save(dir, name)`: escreve as mensagens em arquivo no modo append. Passe `dir` como diretório (pode ser `""`) e `name` o nome do arquivo (padrão: `"log.txt"`).
 
 Observações:
 - As mensagens ficam em memória até você exibir/salvar. Repetir `save` escreverá novamente o mesmo bloco (com novo cabeçalho).
-- O índice mostrado em cada mensagem é baseado no tamanho atual da lista quando a mensagem é adicionada.
+- Para salvar usando apenas um caminho completo, chame `log.save(dir, name)` com `dir` sendo o diretório (ou `""`) e `name` o nome do arquivo.
+
+## Configurações úteis
+
+- `log.debugMode` (boolean): quando `true`, mensagens de `log.debug(...)` serão exibidas e gravadas. Por padrão fica desligado até você definir `log.debugMode = true`.
 
 ## Compatibilidade
 
@@ -70,14 +84,14 @@ Observações:
 
 ## Desenvolvimento
 
-- Código-fonte principal: `src/log.lua`.
+- Código-fonte principal: `loglua/init.lua`.
 - Exemplo simples de execução durante o desenvolvimento:
 
 ```bash
-lua -e 'package.path="src/?.lua;"..package.path; local log=require("log"); log("hello"); log.show()'
+lua -e 'package.path="loglua/?.lua;"..package.path; local log=require("loglua"); log("hello"); log.show()'
 ```
 
-- Há um `test/test.lua` de exemplo; ajuste o `package.path` conforme seu ambiente se necessário.
+- Há um `loglua/test/init.lua` de exemplo; ajuste o `package.path` conforme seu ambiente se necessário.
 
 ## Licença
 
