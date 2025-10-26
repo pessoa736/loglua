@@ -1,4 +1,6 @@
-local log = {
+local log = {}
+
+log = {
     _messages = {},
     
     show = function ()
@@ -43,6 +45,9 @@ local log = {
 } 
 
 return setmetatable(log, {
+    __index = function(s, k)
+        return log[k]
+    end,
     __call = function(_, ...)
         log.add(...)
     end

@@ -1,7 +1,7 @@
 
-package.path = ";".. package.path .. "/src/?.lua;"
+package.path = ";".. package.path .. ";../?/init.lua"
 
-log = require("log")
+log = require("loglua")
 
 soma = function(...)
     local args = {...}
@@ -19,3 +19,5 @@ log(n1, n2)
 
 s = soma(n1, n2)
 log(s)
+
+log.show()
