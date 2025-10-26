@@ -2,28 +2,35 @@ local log = {}
 
 log = {
     _messages = {},
-    
+    _NErrors = 0,
     show = function ()
         for i, v in ipairs(log._messages) do
             print(v)
         end 
-        print("Total messages: " .. #log._messages)	
+        print("\nTotal prints: ", #log._messages)
+        print("Total erros: ", log._NErrors)
     end,
 
-    save = function (logDirFile)
-        local base = logDirFile
+    save = function (logDirFile, name)
+        local base = logDirFile .. (name or "log.txt")
+        
+        local Checkfile <close> = io.open(base, "r+")
+        local exist = Checkfile ~= nil
+        if Checkfile then Checkfile:close() end
 
-        local file = io.open(base, "a+")
+        local file = io.open(base, not Checkfile and "w+" or "a+")
         if not file then
-            print("Error opening file for writing: ")
-            return
-        end
-
-        for i, v in ipairs(log._messages) do
-            if i <= 1 then
-                file:write("\n\n--\t\t" ..  os.date() .. "\t\t--\n") 
+            error("save erro")
+        else
+            for i, v in ipairs(log._messages) do
+                if i <= 1 then
+                    local line = string.rep("-=",21)
+                    file:write('\n\n'.. line .."\n")
+                    file:write("--\t\t" ..  os.date() .. "\t\t--\n") 
+                    file:write(line .."\n\n")
+                end
+                file:write(v .. "\n")
             end
-            file:write(v .. "\n")
         end
 
         file:close()
@@ -38,9 +45,13 @@ log = {
             message = message .. " " .. tostring(v)
         end
         
-        local text = "[ ".. #log._messages .." ]".. message
+        local text = "[ ".. (#log._messages + 1) .." ]".. message
         
         table.insert(log._messages, text)
+    end,
+    error = function(...)
+        log._NErrors = log._NErrors + 1
+        log.add("///-- Error: ", ...)
     end
 } 
 
