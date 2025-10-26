@@ -1,7 +1,0 @@
-# # esse dockerfile é só para rodar os scripts para test
-
-services:
-  log_lib:
-    build: .
-    tty: true
-    
