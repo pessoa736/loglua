@@ -24,7 +24,7 @@ log = {
 
         local index = 0
         for i, v in ipairs(log._messages) do
-                if v.type == "log" then
+                if v.type == "log" or  v.type == "error" then
                     index = index + 1
                     print("[".. index.."]".. v.message)
                 elseif v.type == "debug" and log.checkDebugMode() then
@@ -55,7 +55,7 @@ log = {
                     file:write("--\t\t" ..  os.date() .. "\t\t--\n") 
                     file:write(line .."\n\n")
                 end
-                if v.type == "log" then
+                if v.type == "log" or v.type =="error" then
                     index = index + 1
                     file:write("[".. index.."]".. v.message .. "\n")
                 elseif v.type == "debug" and log.checkDebugMode() then
@@ -92,7 +92,7 @@ log = {
 
     error = function(...)
     log._NErrors = log._NErrors + 1
-        local message = ""
+        local message = "////--error:"
 
         for i, v in ipairs({...}) do
             message = message .. " " .. tostring(v)

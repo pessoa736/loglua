@@ -1,8 +1,8 @@
 
-package.path = ";".. package.path .. ";../?/init.lua"
+package.path = ";".. package.path .. ";./../?.lua"
 
 --global 
-log = require("loglua")
+log = require("init")
 
 soma = function(...)
     local args = {...}
