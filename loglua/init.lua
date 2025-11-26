@@ -51,6 +51,9 @@ local helpModule = require(path .. ".help")
 -- @table log
 local log = {}
 
+--- Flag para mostrar dica de ajuda (só uma vez)
+local showHelpTip = true
+
 --============================================================================
 -- CONFIGURAÇÃO DE DEBUG
 --============================================================================
@@ -244,6 +247,21 @@ function log.show(filter)
                 print("Seções: ", table.concat(sections, ", "))
             end
         end
+        
+        -- Mostra dica de ajuda (só uma vez)
+        if showHelpTip then
+            local lang = helpModule.getLanguage()
+            local tip
+            if lang == "en" then
+                tip = "💡 Tip: log.help() for help | log.setLanguage('pt'|'es') to change language"
+            elseif lang == "es" then
+                tip = "💡 Consejo: log.help() para ayuda | log.setLanguage('pt'|'en') para cambiar idioma"
+            else
+                tip = "💡 Dica: log.help() para ajuda | log.setLanguage('en'|'es') para mudar idioma"
+            end
+            print("\n" .. tip)
+            showHelpTip = false
+        end
     end
 end
 
@@ -422,12 +440,30 @@ function log.inSection(sectionName)
 end
 
 --============================================================================
--- AJUDA
+-- AJUDA E IDIOMA
 --============================================================================
+
+--- Define o idioma da ajuda
+-- @function setLanguage
+-- @tparam string lang Código do idioma ("pt", "en", "es")
+-- @usage
+--   log.setLanguage("en")  -- English
+--   log.setLanguage("pt")  -- Português
+--   log.setLanguage("es")  -- Español
+function log.setLanguage(lang)
+    helpModule.setLanguage(lang)
+end
+
+--- Retorna o idioma atual da ajuda
+-- @function getLanguage
+-- @treturn string Código do idioma ("pt", "en", "es")
+function log.getLanguage()
+    return helpModule.getLanguage()
+end
 
 --- Exibe ajuda sobre o uso do LogLua
 -- @function help
--- @tparam[opt] string topic Tópico de ajuda ("sections", "api")
+-- @tparam[opt] string topic Tópico de ajuda ("sections", "live", "api")
 -- @usage
 --   log.help()            -- ajuda geral
 --   log.help("sections")  -- ajuda sobre seções
