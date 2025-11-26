@@ -1,5 +1,7 @@
 # LogLua
 
+**🌐 Idioma:** [Português](README.pt-BR.md) | [English](README.md) | [Español](README.es.md)
+
 Sistema de logging modular e minimalista para Lua: colete mensagens em memória, organize por seções/categorias, agrupe mensagens consecutivas automaticamente, monitore em tempo real com modo live, exiba no console e salve em arquivos com cabeçalho timestamped.
 
 ## ✨ Características

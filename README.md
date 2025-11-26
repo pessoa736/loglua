@@ -1,5 +1,7 @@
 # LogLua
 
+**🌐 Language:** [English](README.md) | [Español](README.es.md) | [Português](README.pt-BR.md)
+
 A modular and minimalist logging system for Lua: collect messages in memory, organize by sections/categories, automatically group consecutive messages, monitor in real-time with live mode, display in console and save to files with timestamped headers.
 
 ## ✨ Features
