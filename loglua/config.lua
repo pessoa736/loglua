@@ -20,12 +20,16 @@
 -- @field _errorCount number Contador de erros
 -- @field _sections table Seções registradas (lookup table)
 -- @field _defaultSection string Nome da seção padrão
+-- @field _lastShownIndex number Índice da última mensagem exibida (para modo live)
+-- @field _liveMode boolean Indica se modo live está ativo
 local config = {
     _debugMode = false,
     _messages = {},
     _errorCount = 0,
     _sections = {},
-    _defaultSection = "general"
+    _defaultSection = "general",
+    _lastShownIndex = 0,
+    _liveMode = false
 }
 
 --============================================================================
@@ -201,6 +205,56 @@ function config.clear()
     config._messages = {}
     config._sections = {}
     config._errorCount = 0
+    config._lastShownIndex = 0
+end
+
+--============================================================================
+-- MODO LIVE
+--============================================================================
+
+--- Ativa o modo live (ao-vivo)
+-- @function activateLiveMode
+function config.activateLiveMode()
+    config._liveMode = true
+    config._lastShownIndex = #config._messages
+end
+
+--- Desativa o modo live
+-- @function deactivateLiveMode
+function config.deactivateLiveMode()
+    config._liveMode = false
+end
+
+--- Verifica se o modo live está ativo
+-- @function isLiveMode
+-- @treturn boolean true se modo live está ativo
+function config.isLiveMode()
+    return config._liveMode
+end
+
+--- Retorna o índice da última mensagem exibida
+-- @function getLastShownIndex
+-- @treturn number Índice da última mensagem exibida
+function config.getLastShownIndex()
+    return config._lastShownIndex
+end
+
+--- Define o índice da última mensagem exibida
+-- @function setLastShownIndex
+-- @tparam number index Novo índice
+function config.setLastShownIndex(index)
+    config._lastShownIndex = index
+end
+
+--- Retorna apenas as novas mensagens (desde o último show)
+-- @function getNewMessages
+-- @treturn table Lista de novas mensagens
+function config.getNewMessages()
+    local newMessages = {}
+    for i = config._lastShownIndex + 1, #config._messages do
+        table.insert(newMessages, config._messages[i])
+    end
+    return newMessages
 end
 
 return config

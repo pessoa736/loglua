@@ -107,30 +107,93 @@ log.getDefaultSection = config.getDefaultSection
 log.getSections = config.getSections
 
 --============================================================================
+-- MODO LIVE (AO-VIVO)
+--============================================================================
+
+--- Ativa o modo live (ao-vivo)
+-- No modo live, log.show() exibe apenas as novas mensagens desde a última chamada
+-- @function live
+-- @usage
+--   log.live()     -- ativa modo live
+--   log("msg1")
+--   log.show()     -- mostra só msg1
+--   log("msg2")
+--   log.show()     -- mostra só msg2
+log.live = config.activateLiveMode
+
+--- Desativa o modo live
+-- @function unlive
+-- @usage log.unlive()  -- volta ao modo normal
+log.unlive = config.deactivateLiveMode
+
+--- Verifica se o modo live está ativo
+-- @function isLive
+-- @treturn boolean true se modo live está ativo
+log.isLive = config.isLiveMode
+
+--============================================================================
 -- EXIBIÇÃO DE LOGS
 --============================================================================
 
 --- Exibe o log no console com filtro opcional de seção
 -- Mensagens consecutivas da mesma seção são agrupadas com índice [x-y]
+-- No modo live, exibe apenas as novas mensagens desde a última chamada
 -- @function show
 -- @tparam[opt] string|table filter Nome da seção ou tabela com múltiplas seções
 -- @usage
---   log.show()                        -- mostra todos
+--   log.show()                        -- mostra todos (ou novos no modo live)
 --   log.show("network")               -- filtra por seção "network"
 --   log.show({"network", "database"}) -- filtra por múltiplas seções
 function log.show(filter)
-    print(formatter.createHeader())
-    
-    -- Obtém mensagens filtradas baseado no tipo do filtro
+    -- Obtém mensagens baseado no modo (live ou normal)
     local messages
-    if type(filter) == "string" then
-        messages = config.getMessagesBySection(filter)
-        print("Filtro: [" .. filter .. "]\n")
-    elseif type(filter) == "table" then
-        messages = config.getMessagesBySections(filter)
-        print("Filtro: [" .. table.concat(filter, ", ") .. "]\n")
+    local isLive = config.isLiveMode()
+    
+    if isLive then
+        -- Modo live: pega só as novas mensagens
+        messages = config.getNewMessages()
+        
+        if #messages == 0 then
+            return -- Nada novo pra mostrar
+        end
     else
-        messages = config.getMessages()
+        -- Modo normal: pega todas as mensagens
+        print(formatter.createHeader())
+        
+        if type(filter) == "string" then
+            messages = config.getMessagesBySection(filter)
+            print("Filtro: [" .. filter .. "]\n")
+        elseif type(filter) == "table" then
+            messages = config.getMessagesBySections(filter)
+            print("Filtro: [" .. table.concat(filter, ", ") .. "]\n")
+        else
+            messages = config.getMessages()
+        end
+    end
+    
+    -- Aplica filtro de seção se especificado (modo live também)
+    if isLive and filter then
+        local filtered = {}
+        local sectionLookup = {}
+        
+        if type(filter) == "string" then
+            sectionLookup[filter] = true
+        elseif type(filter) == "table" then
+            for _, s in ipairs(filter) do
+                sectionLookup[s] = true
+            end
+        end
+        
+        for _, msg in ipairs(messages) do
+            if sectionLookup[msg.section] then
+                table.insert(filtered, msg)
+            end
+        end
+        messages = filtered
+        
+        if #messages == 0 then
+            return -- Nada novo na seção filtrada
+        end
     end
     
     -- Agrupa mensagens consecutivas da mesma seção
@@ -141,15 +204,20 @@ function log.show(filter)
         print(formatter.formatGroup(group))
     end
     
-    -- Exibe estatísticas
-    print("\nTotal prints: ", #messages)
-    print("Total erros: ", config.getErrorCount())
-    
-    -- Mostra seções disponíveis se não houver filtro
-    if not filter then
-        local sections = config.getSections()
-        if #sections > 0 then
-            print("Seções: ", table.concat(sections, ", "))
+    -- Atualiza índice da última mensagem exibida (modo live)
+    if isLive then
+        config.setLastShownIndex(#config.getMessages())
+    else
+        -- Exibe estatísticas apenas no modo normal
+        print("\nTotal prints: ", #messages)
+        print("Total erros: ", config.getErrorCount())
+        
+        -- Mostra seções disponíveis se não houver filtro
+        if not filter then
+            local sections = config.getSections()
+            if #sections > 0 then
+                print("Seções: ", table.concat(sections, ", "))
+            end
         end
     end
 end
@@ -290,7 +358,6 @@ end
 -- @local
 local function meta(s)
     return setmetatable(s, {
-            __index = function (_, k) return s[k] end,
             __call = function(_, ...)
                 s.add(...)
             end
