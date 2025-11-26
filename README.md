@@ -18,7 +18,7 @@ Sistema de logging modular e minimalista para Lua: colete mensagens em memória,
 ### Via LuaRocks
 
 ```bash
-luarocks make rockspecs/loglua-1.2-1.rockspec
+luarocks make rockspecs/loglua-1.3-1.rockspec
 ```
 
 ### Manualmente
@@ -191,6 +191,14 @@ print(table.concat(log.getSections(), ", "))
 | `log.checkDebugMode()` | Verifica se debug mode está ativo |
 | `log.clear()` | Limpa todas as mensagens e reseta contadores |
 
+### Ajuda
+
+| Função | Descrição |
+|--------|-----------|
+| `log.help()` | Exibe ajuda geral |
+| `log.help("sections")` | Ajuda sobre sistema de seções |
+| `log.help("api")` | Lista completa da API |
+
 ## 🏗️ Estrutura do Projeto
 
 ```text
@@ -198,7 +206,8 @@ loglua/
 ├── init.lua         # Módulo principal (API pública)
 ├── config.lua       # Configuração e estado (mensagens, debug, contadores)
 ├── formatter.lua    # Formatação de mensagens e cabeçalhos
-└── file_handler.lua # Operações de arquivo (I/O)
+├── file_handler.lua # Operações de arquivo (I/O)
+└── help.lua         # Sistema de ajuda integrado
 ```
 
 ### Arquitetura
@@ -207,6 +216,7 @@ loglua/
 - **`config.lua`**: Gerencia estado interno (mensagens, seções, contadores)
 - **`formatter.lua`**: Formatação de texto (cabeçalhos, mensagens, separadores)
 - **`file_handler.lua`**: Operações de I/O de arquivo
+- **`help.lua`**: Documentação integrada acessível via `log.help()`
 
 ## 📝 Exemplos Avançados
 

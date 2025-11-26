@@ -33,6 +33,11 @@
         -- Salvar logs
         log.save("./logs/", "app.log")
         log.save("./logs/", "network.log", "network")
+        
+        -- Ajuda
+        log.help()              -- ajuda geral
+        log.help("sections")    -- ajuda sobre seções
+        log.help("api")         -- lista da API
 ]]
 
 -- Importa módulos internos
@@ -40,6 +45,7 @@ local path = (...):match("(.+)%.[^%.]+$") or (...)
 local config = require(path .. ".config")
 local formatter = require(path .. ".formatter")
 local fileHandler = require(path .. ".file_handler")
+local helpModule = require(path .. ".help")
 
 --- Módulo principal de logging
 -- @table log
@@ -313,6 +319,21 @@ function log.inSection(sectionName)
             log.error(log.section(sectionName), ...)
         end
     })
+end
+
+--============================================================================
+-- AJUDA
+--============================================================================
+
+--- Exibe ajuda sobre o uso do LogLua
+-- @function help
+-- @tparam[opt] string topic Tópico de ajuda ("sections", "api")
+-- @usage
+--   log.help()            -- ajuda geral
+--   log.help("sections")  -- ajuda sobre seções
+--   log.help("api")       -- lista completa da API
+function log.help(topic)
+    helpModule.show(topic)
 end
 
 --============================================================================
