@@ -21,7 +21,7 @@ Sistema de logging modular y minimalista para Lua: recopile mensajes en memoria,
 ### Via LuaRocks
 
 ```bash
-luarocks make rockspecs/loglua-1.4-1.rockspec
+luarocks make rockspecs/loglua-1.5-1.rockspec
 ```
 
 ### Manualmente

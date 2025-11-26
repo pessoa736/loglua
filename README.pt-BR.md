@@ -21,7 +21,7 @@ Sistema de logging modular e minimalista para Lua: colete mensagens em memória,
 ### Via LuaRocks
 
 ```bash
-luarocks make rockspecs/loglua-1.4-1.rockspec
+luarocks make rockspecs/loglua-1.5-1.rockspec
 ```
 
 ### Manualmente
