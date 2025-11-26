@@ -1,0 +1,87 @@
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+--	Tue Nov 25 20:52:50 2025	--
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+[1][network]
+ Iniciando conexão com servidor
+
+[2][auth]
+ Tentando autenticar usuário
+
+[3][database]
+ Conectando ao banco de dados
+
+[4][network]
+ Conexão estabelecida
+
+[5][auth]
+ Usuário autenticado com sucesso
+
+[6][database]
+ Query SELECT executada
+
+[7][network]
+////--error: Timeout na requisição
+
+[8][database]
+////--error: Falha na query INSERT
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+--	Tue Nov 25 20:55:58 2025	--
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+[1][network]
+ Iniciando conexão com servidor
+
+[2][auth]
+ Tentando autenticar usuário
+
+[3][database]
+ Conectando ao banco de dados
+
+[4][network]
+ Conexão estabelecida
+
+[5][auth]
+ Usuário autenticado com sucesso
+
+[6][database]
+ Query SELECT executada
+
+[7][network]
+////--error: Timeout na requisição
+
+[8][database]
+////--error: Falha na query INSERT
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+--	Tue Nov 25 20:57:12 2025	--
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+[1][network]
+ Iniciando conexão com servidor
+
+[2][auth]
+ Tentando autenticar usuário
+
+[3][database]
+ Conectando ao banco de dados
+
+[4][network]
+ Conexão estabelecida
+
+[5][auth]
+ Usuário autenticado com sucesso
+
+[6][database]
+ Query SELECT executada
+
+[7][network]
+////--error: Timeout na requisição
+
+[8][database]
+////--error: Falha na query INSERT
+
