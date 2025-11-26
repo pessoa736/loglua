@@ -1,58 +1,58 @@
 # LogLua
 
-Sistema de logging modular e minimalista para Lua: colete mensagens em memória, organize por seções/categorias, agrupe mensagens consecutivas automaticamente, monitore em tempo real com modo live, exiba no console e salve em arquivos com cabeçalho timestamped.
+A modular and minimalist logging system for Lua: collect messages in memory, organize by sections/categories, automatically group consecutive messages, monitor in real-time with live mode, display in console and save to files with timestamped headers.
 
-## ✨ Características
+## ✨ Features
 
-- 📝 **Logging simples** - Adicione mensagens com múltiplos valores
-- 🏷️ **Sistema de seções** - Organize logs por categorias
-- 📦 **Agrupamento automático** - Mensagens consecutivas da mesma seção são agrupadas `[1-3][section]`
-- 🔴 **Modo Live** - Monitore logs em tempo real
-- 🔍 **Filtros** - Exiba/salve apenas seções específicas
-- 🐛 **Modo debug** - Mensagens de debug condicionais
-- ❌ **Rastreamento de erros** - Contador automático de erros
-- 📁 **Salvamento em arquivo** - Append com timestamps
-- 🧩 **Arquitetura modular** - Código bem organizado
+- 📝 **Simple logging** - Add messages with multiple values
+- 🏷️ **Section system** - Organize logs by categories
+- 📦 **Auto grouping** - Consecutive messages from same section are grouped `[1-3][section]`
+- 🔴 **Live Mode** - Monitor logs in real-time
+- 🔍 **Filters** - Display/save only specific sections
+- 🐛 **Debug mode** - Conditional debug messages
+- ❌ **Error tracking** - Automatic error counter
+- 📁 **File saving** - Append with timestamps
+- 🧩 **Modular architecture** - Well organized code
 
-## 📦 Instalação
+## 📦 Installation
 
 ### Via LuaRocks
 
 ```bash
-luarocks make rockspecs/loglua-1.3-1.rockspec
+luarocks make rockspecs/loglua-1.4-1.rockspec
 ```
 
-### Manualmente
+### Manually
 
 ```lua
 package.path = "loglua/?.lua;" .. package.path
 local log = require("loglua")
 ```
 
-## 🚀 Início Rápido
+## 🚀 Quick Start
 
 ```lua
 local log = require("loglua")
 
--- Log simples (aceita múltiplos valores)
-log("Iniciando aplicação", "v1.0")
-log.add("Usuário:", "davi")
+-- Simple log (accepts multiple values)
+log("Starting application", "v1.0")
+log.add("User:", "davi")
 
--- Mensagem de debug (só aparece se debug mode ativo)
+-- Debug message (only shows if debug mode is active)
 log.activateDebugMode()
-log.debug("Variável x =", 42)
+log.debug("Variable x =", 42)
 
--- Registrar erro (incrementa contador interno)
-log.error("Falha ao carregar recurso")
+-- Register error (increments internal counter)
+log.error("Failed to load resource")
 
--- Exibir tudo no console
+-- Display everything in console
 log.show()
 
--- Salvar em arquivo
+-- Save to file
 log.save("./logs/", "app.log")
 ```
 
-Saída exemplo (mensagens consecutivas da mesma seção são agrupadas):
+Example output (consecutive messages from same section are grouped):
 
 ```text
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -60,265 +60,265 @@ Saída exemplo (mensagens consecutivas da mesma seção são agrupadas):
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 [1-2][general]
- Iniciando aplicação v1.0
- Usuário: davi
+ Starting application v1.0
+ User: davi
 
 [3][general]__
- Variável x = 42
+ Variable x = 42
 
 [4][general]
-////--error: Falha ao carregar recurso
+////--error: Failed to load resource
 
 Total prints:  4
-Total erros:  1
-Seções:  general
+Total errors:  1
+Sections:  general
 ```
 
-## 📦 Agrupamento Automático
+## 📦 Auto Grouping
 
-Mensagens consecutivas da mesma seção são automaticamente agrupadas para melhor legibilidade:
+Consecutive messages from the same section are automatically grouped for better readability:
 
 ```lua
 local net = log.inSection("network")
-net("Conectando...")
+net("Connecting...")
 net("Handshake OK")
-net("Autenticado")
+net("Authenticated")
 
-log.add(log.section("database"), "Query executada")
+log.add(log.section("database"), "Query executed")
 
-net("Enviando dados")
-net("Resposta recebida")
+net("Sending data")
+net("Response received")
 ```
 
-Saída:
+Output:
 
 ```text
 [1-3][network]
- Conectando...
+ Connecting...
  Handshake OK
- Autenticado
+ Authenticated
 
 [4][database]
- Query executada
+ Query executed
 
 [5-6][network]
- Enviando dados
- Resposta recebida
+ Sending data
+ Response received
 ```
 
-## 🏷️ Sistema de Seções
+## 🏷️ Section System
 
-Organize seus logs por categorias para facilitar a filtragem:
+Organize your logs by categories for easy filtering:
 
-### Método 1: Usando `log.section()`
+### Method 1: Using `log.section()`
 
 ```lua
-log.add(log.section("network"), "Conexão estabelecida")
-log.error(log.section("database"), "Query falhou")
-log.debug(log.section("parser"), "Token encontrado:", token)
+log.add(log.section("network"), "Connection established")
+log.error(log.section("database"), "Query failed")
+log.debug(log.section("parser"), "Token found:", token)
 ```
 
-### Método 2: Usando `log.inSection()`
+### Method 2: Using `log.inSection()`
 
-Cria um objeto vinculado a uma seção específica:
+Creates an object bound to a specific section:
 
 ```lua
 local netLog = log.inSection("network")
-netLog.add("Conectando ao servidor...")
-netLog.add("Resposta recebida")
+netLog.add("Connecting to server...")
+netLog.add("Response received")
 netLog.error("Timeout!")
-netLog("Atalho para add")  -- pode chamar diretamente
+netLog("Shortcut for add")  -- can call directly
 ```
 
-### Método 3: Definindo seção padrão
+### Method 3: Setting default section
 
 ```lua
 log.setDefaultSection("game")
-log.add("Player spawned")  -- vai para seção "game"
-log.add("Score: 100")      -- vai para seção "game"
+log.add("Player spawned")  -- goes to "game" section
+log.add("Score: 100")      -- goes to "game" section
 ```
 
-### Filtrando por seções
+### Filtering by sections
 
 ```lua
--- Mostrar apenas uma seção
+-- Show only one section
 log.show("network")
 
--- Mostrar múltiplas seções
+-- Show multiple sections
 log.show({"network", "database"})
 
--- Salvar com filtro
+-- Save with filter
 log.save("./", "network.log", "network")
 log.save("./", "errors.log", {"network", "database"})
 
--- Listar seções disponíveis
+-- List available sections
 print(table.concat(log.getSections(), ", "))
 ```
 
-## 🔴 Modo Live (Tempo Real)
+## 🔴 Live Mode (Real-Time)
 
-O modo live permite monitorar logs em tempo real, exibindo apenas as novas mensagens desde a última chamada de `log.show()`.
+Live mode allows monitoring logs in real-time, displaying only new messages since the last `log.show()` call.
 
-### Ativando e desativando
+### Activating and deactivating
 
 ```lua
-log.live()      -- ativa modo live
-log.unlive()    -- desativa modo live
-log.isLive()    -- retorna true se modo live está ativo
+log.live()      -- activate live mode
+log.unlive()    -- deactivate live mode
+log.isLive()    -- returns true if live mode is active
 ```
 
-### Exemplo de monitoramento
+### Monitoring example
 
 ```lua
 local log = require("loglua")
 
--- Ativar modo live
+-- Activate live mode
 log.live()
 
--- Simular aplicação em execução
+-- Simulate running application
 for i = 1, 10 do
-    log("Evento " .. i)
+    log("Event " .. i)
     
     if i % 3 == 0 then
-        log.show()  -- mostra só os novos logs (últimos 3)
+        log.show()  -- shows only new logs (last 3)
     end
 end
 
-log.unlive()  -- voltar ao modo normal
-log.show()    -- agora mostra todos os logs com header
+log.unlive()  -- back to normal mode
+log.show()    -- now shows all logs with header
 ```
 
-### Monitoramento contínuo
+### Continuous monitoring
 
 ```lua
 log.live()
 
 local running = true
 while running do
-    -- seu código que gera logs...
+    -- your code that generates logs...
     processEvents()
     
-    log.show()  -- mostra só as novas mensagens
+    log.show()  -- shows only new messages
     sleep(1)
 end
 ```
 
-### Modo live com filtros
+### Live mode with filters
 
 ```lua
 log.live()
 
--- Monitorar apenas logs de rede
+-- Monitor only network logs
 log.show("network")
 
--- Ou múltiplas seções
+-- Or multiple sections
 log.show({"network", "database"})
 ```
 
-### Comportamento
+### Behavior
 
-| Modo | Comportamento de `log.show()` |
+| Mode | `log.show()` behavior |
 |------|------------------------------|
-| Normal | Exibe todas as mensagens com header e estatísticas |
-| Live | Exibe apenas novas mensagens desde a última chamada |
+| Normal | Displays all messages with header and statistics |
+| Live | Displays only new messages since last call |
 
-## 📖 API Completa
+## 📖 Complete API
 
-### Logging Básico
+### Basic Logging
 
-| Função | Descrição |
+| Function | Description |
 |--------|-----------|
-| `log(...)` | Atalho para `log.add(...)` |
-| `log.add(...)` | Adiciona mensagem de log |
-| `log.debug(...)` | Adiciona mensagem de debug (requer `debugMode`) |
-| `log.error(...)` | Adiciona mensagem de erro (incrementa contador) |
+| `log(...)` | Shortcut for `log.add(...)` |
+| `log.add(...)` | Adds log message |
+| `log.debug(...)` | Adds debug message (requires `debugMode`) |
+| `log.error(...)` | Adds error message (increments counter) |
 
-### Seções
+### Sections
 
-| Função | Descrição |
+| Function | Description |
 |--------|-----------|
-| `log.section(name)` | Cria tag de seção para usar em add/debug/error |
-| `log.inSection(name)` | Retorna objeto com add/debug/error pré-configurados |
-| `log.setDefaultSection(name)` | Define seção padrão para novas mensagens |
-| `log.getDefaultSection()` | Retorna nome da seção padrão atual |
-| `log.getSections()` | Retorna lista de todas as seções utilizadas |
+| `log.section(name)` | Creates section tag to use in add/debug/error |
+| `log.inSection(name)` | Returns object with pre-configured add/debug/error |
+| `log.setDefaultSection(name)` | Sets default section for new messages |
+| `log.getDefaultSection()` | Returns current default section name |
+| `log.getSections()` | Returns list of all used sections |
 
-### Exibição e Salvamento
+### Display and Saving
 
-| Função | Descrição |
+| Function | Description |
 |--------|-----------|
-| `log.show([filter])` | Exibe logs no console (filtro opcional) |
-| `log.save([dir], [name], [filter])` | Salva logs em arquivo (filtro opcional) |
+| `log.show([filter])` | Displays logs in console (optional filter) |
+| `log.save([dir], [name], [filter])` | Saves logs to file (optional filter) |
 
-### Modo Live
+### Live Mode
 
-| Função | Descrição |
+| Function | Description |
 |--------|-----------|
-| `log.live()` | Ativa modo live (tempo real) |
-| `log.unlive()` | Desativa modo live |
-| `log.isLive()` | Verifica se modo live está ativo |
+| `log.live()` | Activates live mode (real-time) |
+| `log.unlive()` | Deactivates live mode |
+| `log.isLive()` | Checks if live mode is active |
 
-### Configuração
+### Configuration
 
-| Função | Descrição |
+| Function | Description |
 |--------|-----------|
-| `log.activateDebugMode()` | Ativa modo debug |
-| `log.deactivateDebugMode()` | Desativa modo debug |
-| `log.checkDebugMode()` | Verifica se debug mode está ativo |
-| `log.clear()` | Limpa todas as mensagens e reseta contadores |
+| `log.activateDebugMode()` | Activates debug mode |
+| `log.deactivateDebugMode()` | Deactivates debug mode |
+| `log.checkDebugMode()` | Checks if debug mode is active |
+| `log.clear()` | Clears all messages and resets counters |
 
-### Ajuda
+### Help
 
-| Função | Descrição |
+| Function | Description |
 |--------|-----------|
-| `log.help()` | Exibe ajuda geral |
-| `log.help("sections")` | Ajuda sobre sistema de seções |
-| `log.help("live")` | Ajuda sobre modo live |
-| `log.help("api")` | Lista completa da API |
+| `log.help()` | Displays general help |
+| `log.help("sections")` | Help about section system |
+| `log.help("live")` | Help about live mode |
+| `log.help("api")` | Complete API list |
 
-## 🏗️ Estrutura do Projeto
+## 🏗️ Project Structure
 
 ```text
 loglua/
-├── init.lua         # Módulo principal (API pública)
-├── config.lua       # Configuração e estado (mensagens, debug, contadores)
-├── formatter.lua    # Formatação de mensagens e cabeçalhos
-├── file_handler.lua # Operações de arquivo (I/O)
-└── help.lua         # Sistema de ajuda integrado
+├── init.lua         # Main module (public API)
+├── config.lua       # Configuration and state (messages, debug, counters)
+├── formatter.lua    # Message and header formatting
+├── file_handler.lua # File operations (I/O)
+└── help.lua         # Built-in help system
 ```
 
-### Arquitetura
+### Architecture
 
-- **`init.lua`**: API pública, integra todos os módulos
-- **`config.lua`**: Gerencia estado interno (mensagens, seções, contadores)
-- **`formatter.lua`**: Formatação de texto (cabeçalhos, mensagens, separadores)
-- **`file_handler.lua`**: Operações de I/O de arquivo
-- **`help.lua`**: Documentação integrada acessível via `log.help()`
+- **`init.lua`**: Public API, integrates all modules
+- **`config.lua`**: Manages internal state (messages, sections, counters)
+- **`formatter.lua`**: Text formatting (headers, messages, separators)
+- **`file_handler.lua`**: File I/O operations
+- **`help.lua`**: Built-in documentation accessible via `log.help()`
 
-## 📝 Exemplos Avançados
+## 📝 Advanced Examples
 
-### Logger para múltiplos sistemas
+### Logger for multiple systems
 
 ```lua
 local log = require("loglua")
 
--- Criar loggers específicos
+-- Create specific loggers
 local networkLog = log.inSection("network")
 local dbLog = log.inSection("database")
 local uiLog = log.inSection("ui")
 
--- Usar em diferentes partes do código
-networkLog("Conectando...")
-dbLog("Query executada")
-uiLog("Tela carregada")
+-- Use in different parts of code
+networkLog("Connecting...")
+dbLog("Query executed")
+uiLog("Screen loaded")
 
--- Salvar cada seção em arquivo separado
+-- Save each section to separate file
 log.save("./logs/", "network.log", "network")
 log.save("./logs/", "database.log", "database")
 log.save("./logs/", "ui.log", "ui")
 ```
 
-### Debug condicional
+### Conditional debug
 
 ```lua
 local log = require("loglua")
@@ -328,35 +328,35 @@ if DEBUG then
     log.activateDebugMode()
 end
 
-log.debug("Esta mensagem só aparece se DEBUG=true")
+log.debug("This message only shows if DEBUG=true")
 ```
 
-### Limpar e reiniciar
+### Clear and restart
 
 ```lua
 local log = require("loglua")
 
-log("Mensagem 1")
-log("Mensagem 2")
+log("Message 1")
+log("Message 2")
 log.show()
 
-log.clear()  -- Limpa tudo
+log.clear()  -- Clears everything
 
-log("Nova sessão")
+log("New session")
 log.show()
 ```
 
-## 📋 Notas
+## 📋 Notes
 
-- Mensagens permanecem em memória até serem limpas com `clear()`
-- Chamar `save` repetidamente faz append no arquivo (com novo timestamp)
-- Mensagens de debug só aparecem se `debugMode` estiver ativo
-- Seções são registradas automaticamente ao adicionar mensagens
+- Messages stay in memory until cleared with `clear()`
+- Calling `save` repeatedly appends to file (with new timestamp)
+- Debug messages only show if `debugMode` is active
+- Sections are automatically registered when adding messages
 
-## 🔧 Compatibilidade
+## 🔧 Compatibility
 
 - Lua >= 5.4
 
-## 📜 Licença
+## 📜 License
 
-MIT — veja `LICENSE`.
+MIT — see `LICENSE`.
