@@ -18,6 +18,24 @@
 local formatter = {}
 
 --============================================================================
+-- CORES ANSI
+--============================================================================
+
+--- Códigos de cores ANSI para terminal
+-- @table colors
+formatter.colors = {
+    reset = "\27[0m",
+    red = "\27[31m",
+    yellow = "\27[33m",
+    green = "\27[32m",
+    cyan = "\27[36m",
+    gray = "\27[90m"
+}
+
+--- Flag para habilitar/desabilitar cores (habilitado por padrão)
+formatter.useColors = true
+
+--============================================================================
 -- SEPARADORES E CABEÇALHOS
 --============================================================================
 
@@ -111,7 +129,7 @@ end
 -- @function groupMessages
 -- @tparam table messages Lista de mensagens
 -- @tparam boolean debugMode Se modo debug está ativo
--- @treturn table Lista de grupos {startIdx, endIdx, section, messages, isDebug}
+-- @treturn table Lista de grupos {startIdx, endIdx, section, messages, msgType}
 function formatter.groupMessages(messages, debugMode)
     local groups = {}
     local currentGroup = nil
@@ -124,12 +142,11 @@ function formatter.groupMessages(messages, debugMode)
         
         if include then
             index = index + 1
-            local isDebug = msg.type == "debug"
             
-            -- Verifica se pode agrupar com o grupo atual
+            -- Verifica se pode agrupar com o grupo atual (mesmo tipo e seção)
             if currentGroup and 
                currentGroup.section == msg.section and 
-               currentGroup.isDebug == isDebug then
+               currentGroup.msgType == msg.type then
                 -- Adiciona ao grupo atual
                 currentGroup.endIdx = index
                 table.insert(currentGroup.messages, msg.message)
@@ -143,7 +160,7 @@ function formatter.groupMessages(messages, debugMode)
                     endIdx = index,
                     section = msg.section,
                     messages = {msg.message},
-                    isDebug = isDebug
+                    msgType = msg.type
                 }
             end
         end
@@ -164,11 +181,28 @@ end
 function formatter.formatGroup(group)
     local indexStr = formatIndex(group.startIdx, group.endIdx)
     local sectionTag = group.section and ("[" .. group.section .. "]") or ""
-    local debugTag = group.isDebug and "__" or ""
+    local typeTag = ""
+    local color = ""
+    local reset = ""
+    
+    -- Aplica cores se habilitado
+    if formatter.useColors then
+        reset = formatter.colors.reset
+        if group.msgType == "debug" then
+            color = formatter.colors.yellow
+            typeTag = "__"
+        elseif group.msgType == "error" then
+            color = formatter.colors.red
+        end
+    else
+        if group.msgType == "debug" then
+            typeTag = "__"
+        end
+    end
     
     local content = table.concat(group.messages, "\n")
     
-    return indexStr .. sectionTag .. debugTag .. "\n" .. content .. "\n"
+    return color .. indexStr .. sectionTag .. typeTag .. "\n" .. content .. reset .. "\n"
 end
 
 --============================================================================

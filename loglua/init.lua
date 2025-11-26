@@ -76,6 +76,31 @@ log.activateDebubMode = config.activateDebugMode
 log.deactivateDebubMode = config.deactivateDebugMode
 
 --============================================================================
+-- CONFIGURAÇÃO DE CORES
+--============================================================================
+
+--- Habilita cores ANSI na saída (errors em vermelho, debug em amarelo)
+-- @function enableColors
+-- @usage log.enableColors()
+function log.enableColors()
+    formatter.useColors = true
+end
+
+--- Desabilita cores ANSI na saída
+-- @function disableColors
+-- @usage log.disableColors()
+function log.disableColors()
+    formatter.useColors = false
+end
+
+--- Verifica se cores estão habilitadas
+-- @function hasColors
+-- @treturn boolean true se cores estão habilitadas
+function log.hasColors()
+    return formatter.useColors
+end
+
+--============================================================================
 -- GERENCIAMENTO DE ESTADO
 --============================================================================
 
@@ -241,6 +266,10 @@ function log.save(logDirFile, name, filter)
     local filepath = fileHandler.buildPath(logDirFile, name)
     local file = fileHandler.openForWrite(filepath)
     
+    -- Desabilita cores temporariamente para salvar em arquivo
+    local hadColors = formatter.useColors
+    formatter.useColors = false
+    
     -- Obtém mensagens filtradas
     local messages
     if type(filter) == "string" then
@@ -267,6 +296,10 @@ function log.save(logDirFile, name, filter)
     end
     
     fileHandler.close(file)
+    
+    -- Restaura configuração de cores
+    formatter.useColors = hadColors
+    
     print("Log saved")
 end
 
