@@ -1,12 +1,13 @@
 # LogLua
 
-Sistema de logging modular e minimalista para Lua: colete mensagens em memória, organize por seções/categorias, agrupe mensagens consecutivas automaticamente, exiba no console e salve em arquivos com cabeçalho timestamped.
+Sistema de logging modular e minimalista para Lua: colete mensagens em memória, organize por seções/categorias, agrupe mensagens consecutivas automaticamente, monitore em tempo real com modo live, exiba no console e salve em arquivos com cabeçalho timestamped.
 
 ## ✨ Características
 
 - 📝 **Logging simples** - Adicione mensagens com múltiplos valores
 - 🏷️ **Sistema de seções** - Organize logs por categorias
 - 📦 **Agrupamento automático** - Mensagens consecutivas da mesma seção são agrupadas `[1-3][section]`
+- 🔴 **Modo Live** - Monitore logs em tempo real
 - 🔍 **Filtros** - Exiba/salve apenas seções específicas
 - 🐛 **Modo debug** - Mensagens de debug condicionais
 - ❌ **Rastreamento de erros** - Contador automático de erros
@@ -154,6 +155,73 @@ log.save("./", "errors.log", {"network", "database"})
 print(table.concat(log.getSections(), ", "))
 ```
 
+## 🔴 Modo Live (Tempo Real)
+
+O modo live permite monitorar logs em tempo real, exibindo apenas as novas mensagens desde a última chamada de `log.show()`.
+
+### Ativando e desativando
+
+```lua
+log.live()      -- ativa modo live
+log.unlive()    -- desativa modo live
+log.isLive()    -- retorna true se modo live está ativo
+```
+
+### Exemplo de monitoramento
+
+```lua
+local log = require("loglua")
+
+-- Ativar modo live
+log.live()
+
+-- Simular aplicação em execução
+for i = 1, 10 do
+    log("Evento " .. i)
+    
+    if i % 3 == 0 then
+        log.show()  -- mostra só os novos logs (últimos 3)
+    end
+end
+
+log.unlive()  -- voltar ao modo normal
+log.show()    -- agora mostra todos os logs com header
+```
+
+### Monitoramento contínuo
+
+```lua
+log.live()
+
+local running = true
+while running do
+    -- seu código que gera logs...
+    processEvents()
+    
+    log.show()  -- mostra só as novas mensagens
+    sleep(1)
+end
+```
+
+### Modo live com filtros
+
+```lua
+log.live()
+
+-- Monitorar apenas logs de rede
+log.show("network")
+
+-- Ou múltiplas seções
+log.show({"network", "database"})
+```
+
+### Comportamento
+
+| Modo | Comportamento de `log.show()` |
+|------|------------------------------|
+| Normal | Exibe todas as mensagens com header e estatísticas |
+| Live | Exibe apenas novas mensagens desde a última chamada |
+
 ## 📖 API Completa
 
 ### Logging Básico
@@ -182,6 +250,14 @@ print(table.concat(log.getSections(), ", "))
 | `log.show([filter])` | Exibe logs no console (filtro opcional) |
 | `log.save([dir], [name], [filter])` | Salva logs em arquivo (filtro opcional) |
 
+### Modo Live
+
+| Função | Descrição |
+|--------|-----------|
+| `log.live()` | Ativa modo live (tempo real) |
+| `log.unlive()` | Desativa modo live |
+| `log.isLive()` | Verifica se modo live está ativo |
+
 ### Configuração
 
 | Função | Descrição |
@@ -197,6 +273,7 @@ print(table.concat(log.getSections(), ", "))
 |--------|-----------|
 | `log.help()` | Exibe ajuda geral |
 | `log.help("sections")` | Ajuda sobre sistema de seções |
+| `log.help("live")` | Ajuda sobre modo live |
 | `log.help("api")` | Lista completa da API |
 
 ## 🏗️ Estrutura do Projeto
