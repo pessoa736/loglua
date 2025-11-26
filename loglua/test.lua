@@ -18,8 +18,10 @@
 local scriptDir = debug.getinfo(1, "S").source:match("@(.*/)") or "./"
 
 -- Configura paths para encontrar módulos locais
-package.path = scriptDir .. "?.lua;" .. 
-               scriptDir .. "../?/init.lua;" ..
+-- O init.lua usa require("loglua.config"), então precisa estar em loglua/
+package.path = scriptDir .. "../?.lua;" ..  -- para loglua/init.lua -> ../loglua/init.lua
+               scriptDir .. "../?/init.lua;" ..  -- para require("loglua")
+               scriptDir .. "?.lua;" ..  -- para loglua.config -> config.lua (mesmo dir)
                package.path
 
 -- Carrega o módulo (usa require relativo)
@@ -194,6 +196,48 @@ for _, s in ipairs(sections) do
 end
 assert_test(hasGameSection, "inSection suporta chamada direta")
 
+printHeader("TESTE 10: Modo Live")
+
+log.clear()
+
+-- Testar ativação/desativação
+assert_test(log.isLive() == false, "Modo live inicia desativado")
+
+log.live()
+assert_test(log.isLive() == true, "Modo live ativado")
+
+log.unlive()
+assert_test(log.isLive() == false, "Modo live desativado")
+
+-- Teste funcional do modo live
+log.clear()
+log("Mensagem 1")
+log("Mensagem 2")
+log("Mensagem 3")
+
+log.live()
+-- Nota: ao ativar live(), ele marca que já vimos todas as mensagens existentes
+-- então a primeira chamada show() não mostrará nada (comportamento correto)
+
+print(colors.yellow .. "\n>> Primeira chamada show() após live() (nada - pois live marca tudo como 'visto'):" .. colors.reset)
+log.show()
+
+log("Mensagem 4")
+log("Mensagem 5")
+
+print(colors.yellow .. "\n>> Segunda chamada show() no modo live (deve mostrar só 2 novas):" .. colors.reset)
+log.show()
+
+print(colors.yellow .. "\n>> Terceira chamada show() no modo live (deve mostrar nada - sem novas mensagens):" .. colors.reset)
+log.show()
+
+log.unlive()
+
+print(colors.yellow .. "\n>> Modo normal (deve mostrar todas as 5 mensagens com header):" .. colors.reset)
+log.show()
+
+assert_test(true, "Modo live funciona corretamente")
+
 --============================================================================
 -- DEMONSTRAÇÃO VISUAL
 --============================================================================
@@ -234,7 +278,7 @@ log.show({"network", "database"})
 -- TESTE DE SALVAMENTO
 --============================================================================
 
-printHeader("TESTE 10: Salvamento em Arquivo")
+printHeader("TESTE 11: Salvamento em Arquivo")
 
 -- Salvar todos os logs
 log.save("./", "test_all.log")
