@@ -346,6 +346,7 @@ function log.add(...)
     
     message = formatter.argsToString(table.unpack(args))
     config.addMessage("log", message, section)
+    if log.isLive() then log.show() end
 end
 
 --- Adiciona uma mensagem de debug (só aparece se debugMode estiver ativo)
@@ -368,6 +369,7 @@ function log.debug(...)
     
     message = formatter.argsToString(table.unpack(args))
     config.addMessage("debug", message, section)
+    if log.isLive() then log.show() end
 end
 
 --- Adiciona uma mensagem de erro (incrementa contador de erros)
@@ -390,6 +392,7 @@ function log.error(...)
     config.incrementErrorCount()
     message = formatter.formatErrorPrefix() .. formatter.argsToString(table.unpack(args))
     config.addMessage("error", message, section)
+    if log.isLive() then log.show() end
 end
 
 --============================================================================

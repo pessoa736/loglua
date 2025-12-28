@@ -1,46 +1,12 @@
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
---	Tue Nov 25 20:52:50 2025	--
+--	Sun Dec 28 16:45:21 2025	--
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 Filtro: [network]
 
-[1][network]
+[1-2][network]
  Iniciando conexão com servidor
-
-[2][network]
- Conexão estabelecida
-
-[3][network]
-////--error: Timeout na requisição
-
-
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
---	Tue Nov 25 20:55:58 2025	--
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-Filtro: [network]
-
-[1][network]
- Iniciando conexão com servidor
-
-[2][network]
- Conexão estabelecida
-
-[3][network]
-////--error: Timeout na requisição
-
-
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
---	Tue Nov 25 20:57:12 2025	--
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-Filtro: [network]
-
-[1][network]
- Iniciando conexão com servidor
-
-[2][network]
  Conexão estabelecida
 
 [3][network]
