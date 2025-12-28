@@ -39,14 +39,14 @@ formatter.useColors = true
 -- SEPARADORES E CABEÇALHOS
 --============================================================================
 
---- Cria uma linha separadora decorativa
--- @function createSeparator
--- @tparam[opt="-="] string char Caractere ou padrão para repetir
--- @tparam[opt=21] number count Número de repetições
--- @treturn string Linha separadora
--- @usage
---   formatter.createSeparator()        -- "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
---   formatter.createSeparator("*", 10) -- "**********"
+---Cria uma linha separadora decorativa
+---@function createSeparator
+---@tparam[opt="-="] string char Caractere ou padrão para repetir
+---@tparam[opt=21] number count Número de repetições
+---@treturn string Linha separadora
+---@usage
+---  formatter.createSeparator()        -- "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+---  formatter.createSeparator("*", 10) -- "**********"
 function formatter.createSeparator(char, count)
     char = char or "-="
     count = count or 21
@@ -54,18 +54,25 @@ function formatter.createSeparator(char, count)
 end
 
 --- Cria o cabeçalho formatado do log com timestamp
--- @function createHeader
--- @treturn string Cabeçalho com linhas separadoras e data/hora
--- @usage
---   print(formatter.createHeader())
---   -- Saída:
---   -- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
---   -- --	Tue Nov 25 14:30:00 2025	--
---   -- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function formatter.createHeader()
-    local line = formatter.createSeparator()
+---@function createHeader
+---@treturn string Cabeçalho com linhas separadoras e data/hora
+---@usage
+---   print(formatter.createHeader())
+---   -- Saída:
+---   -- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+---   -- --	Tue Nov 25 14:30:00 2025	--
+---   -- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function formatter.createHeader(handlerHeader)
+    local char, count, text
+    if type(handlerHeader) == "function" then
+        char, count, text = handlerHeader()
+    else
+        -- Fallback padrão quando nenhum handler é fornecido
+        char, count, text = "-=", 21, nil
+    end
+    local line = formatter.createSeparator(char, count)
     local header = '\n' .. line .. "\n"
-    header = header .. "--\t" .. os.date() .. "\t--\n"
+    header = header .. "--\t" .. (text or os.date()) .. "\t--\n"
     header = header .. line .. "\n\n"
     return header
 end

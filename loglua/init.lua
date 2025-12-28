@@ -78,6 +78,9 @@ log.checkDebugMode = config.isDebugMode
 log.activateDebubMode = config.activateDebugMode
 log.deactivateDebubMode = config.deactivateDebugMode
 
+
+log.setHandlerHeader = config.setHandlerHeader
+
 --============================================================================
 -- CONFIGURAÇÃO DE CORES
 --============================================================================
@@ -186,7 +189,7 @@ function log.show(filter)
         end
     else
         -- Modo normal: pega todas as mensagens
-        print(formatter.createHeader())
+        print(formatter.createHeader(config._HandlerHeader))
         
         if type(filter) == "string" then
             messages = config.getMessagesBySection(filter)
@@ -227,19 +230,9 @@ function log.show(filter)
     -- Agrupa mensagens consecutivas da mesma seção
     local startOffset = 0
     if isLive then
-        -- Começa no índice da última mensagem exibida
-        local lastIdx = config.getLastShownIndex()
-        startOffset = lastIdx
-
-        -- Se a primeira nova mensagem pertence à mesma seção/tipo da última mostrada,
-        -- tente estender a contagem voltando até o início daquele grupo anterior.
-        -- Se o último grupo impresso tem a mesma seção e tipo da primeira nova mensagem,
-        -- mantenha o início do grupo original para a continuação da contagem.
-        if #messages > 0 and lastIdx > 0 and config._lastShownPrinted then
-            if config._lastPrintedGroupSection == messages[1].section and config._lastPrintedGroupType == messages[1].type then
-                startOffset = config._lastPrintedGroupEnd or lastIdx
-            end
-        end
+        -- Em modo live, não combinamos com o grupo anterior — mostramos apenas as novas mensagens
+        -- A contagem continua a partir do último índice exibido
+        startOffset = config.getLastShownIndex()
     end
     local groups = formatter.groupMessages(messages, config.isDebugMode(), startOffset)
     
@@ -325,7 +318,7 @@ function log.save(logDirFile, name, filter)
     end
     
     -- Escreve cabeçalho
-    fileHandler.write(file, formatter.createHeader())
+    fileHandler.write(file, formatter.createHeader(config._HandlerHeader))
     if filter then
         local filterText = type(filter) == "table" and table.concat(filter, ", ") or filter
         fileHandler.write(file, "Filtro: [" .. filterText .. "]\n\n")
