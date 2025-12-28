@@ -113,12 +113,12 @@ end
 -- @tparam[opt] string section Nome da seção (nil para omitir)
 -- @treturn string Mensagem formatada com marcador de debug "__" e quebras de linha
 -- @usage
---   formatter.formatDebugMessage(1, "x = 42")           -- "[1]__\n x = 42\n"
---   formatter.formatDebugMessage(2, "y = 10", "parser") -- "[2][parser]__\n y = 10\n"
+--   formatter.formatDebugMessage(1, "x = 42")           -- "[1]\n__ x = 42\n"
+--   formatter.formatDebugMessage(2, "y = 10", "parser") -- "[2][parser]\n__ y = 10\n"
 function formatter.formatDebugMessage(index, message, section)
     local indexStr = type(index) == "string" and index or ("[" .. index .. "]")
     local sectionTag = section and ("[" .. section .. "]") or ""
-    return indexStr .. sectionTag .. "__\n" .. message .. "\n"
+    return indexStr .. sectionTag .. "\n__ " .. message .. "\n"
 end
 
 --============================================================================
