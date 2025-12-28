@@ -78,6 +78,9 @@ log.checkDebugMode = config.isDebugMode
 log.activateDebubMode = config.activateDebugMode
 log.deactivateDebubMode = config.deactivateDebugMode
 
+
+log.setHandlerHeader = config.setHandlerHeader
+
 --============================================================================
 -- CONFIGURAÇÃO DE CORES
 --============================================================================
@@ -186,7 +189,7 @@ function log.show(filter)
         end
     else
         -- Modo normal: pega todas as mensagens
-        print(formatter.createHeader())
+        print(formatter.createHeader(config._HandlerHeader))
         
         if type(filter) == "string" then
             messages = config.getMessagesBySection(filter)
@@ -225,16 +228,32 @@ function log.show(filter)
     end
     
     -- Agrupa mensagens consecutivas da mesma seção
-    local groups = formatter.groupMessages(messages, config.isDebugMode())
+    local startOffset = 0
+    if isLive then
+        -- Em modo live, não combinamos com o grupo anterior — mostramos apenas as novas mensagens
+        -- A contagem continua a partir do último índice exibido
+        startOffset = config.getLastShownIndex()
+    end
+    local groups = formatter.groupMessages(messages, config.isDebugMode(), startOffset)
     
     -- Exibe cada grupo formatado
     for _, group in ipairs(groups) do
         print(formatter.formatGroup(group))
     end
-    
+
+    -- Se estamos no modo live e imprimimos grupos, registre o último grupo impresso
+    if isLive and #groups > 0 then
+        local lastGroup = groups[#groups]
+        config._lastPrintedGroupStart = lastGroup.startIdx
+        config._lastPrintedGroupEnd = lastGroup.endIdx
+        config._lastPrintedGroupSection = lastGroup.section
+        config._lastPrintedGroupType = lastGroup.msgType
+    end
+
     -- Atualiza índice da última mensagem exibida (modo live)
     if isLive then
         config.setLastShownIndex(#config.getMessages())
+        config._lastShownPrinted = true
     else
         -- Exibe estatísticas apenas no modo normal
         print("\nTotal prints: ", #messages)
@@ -299,14 +318,14 @@ function log.save(logDirFile, name, filter)
     end
     
     -- Escreve cabeçalho
-    fileHandler.write(file, formatter.createHeader())
+    fileHandler.write(file, formatter.createHeader(config._HandlerHeader))
     if filter then
         local filterText = type(filter) == "table" and table.concat(filter, ", ") or filter
         fileHandler.write(file, "Filtro: [" .. filterText .. "]\n\n")
     end
     
     -- Agrupa mensagens consecutivas da mesma seção
-    local groups = formatter.groupMessages(messages, config.isDebugMode())
+    local groups = formatter.groupMessages(messages, config.isDebugMode(), 0)
     
     -- Escreve cada grupo formatado
     for _, group in ipairs(groups) do

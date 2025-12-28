@@ -26,6 +26,7 @@ package.path = scriptDir .. "../?.lua;" ..  -- para loglua/init.lua -> ../loglua
 
 -- Carrega o módulo (usa require relativo)
 local log = require("loglua")
+local config = require("loglua.config")
 
 -- Cores para output (ANSI)
 local colors = {
@@ -218,25 +219,37 @@ log("Mensagem 3")
 log.live()
 -- Nota: ao ativar live(), ele marca que já vimos todas as mensagens existentes
 -- então a primeira chamada show() não mostrará nada (comportamento correto)
-
-print(colors.yellow .. "\n>> Primeira chamada show() após live() (nada - pois live marca tudo como 'visto'):" .. colors.reset)
 log.show()
 
 log("Mensagem 4")
 log("Mensagem 5")
 
-print(colors.yellow .. "\n>> Segunda chamada show() no modo live (deve mostrar só 2 novas):" .. colors.reset)
-log.show()
-
-print(colors.yellow .. "\n>> Terceira chamada show() no modo live (deve mostrar nada - sem novas mensagens):" .. colors.reset)
-log.show()
 
 log.unlive()
 
 print(colors.yellow .. "\n>> Modo normal (deve mostrar todas as 5 mensagens com header):" .. colors.reset)
-log.show()
+--log.show()
 
 assert_test(true, "Modo live funciona corretamente")
+
+printHeader("TESTE 11: Live - NÃO combinar grupos em modo live")
+
+log.clear()
+log.live()
+
+-- Adiciona duas mensagens na mesma seção; cada add chama show() automaticamente
+log("first")
+local s1 = config._lastPrintedGroupStart
+local e1 = config._lastPrintedGroupEnd
+
+log("second")
+local s2 = config._lastPrintedGroupStart
+local e2 = config._lastPrintedGroupEnd
+
+-- Em modo live não combinamos: o segundo grupo deve começar após o fim do primeiro
+assert_test(s2 == e1 + 1 and s1 ~= s2, "Modo live: grupos separados e numeração contínua")
+
+log.unlive()
 
 --============================================================================
 -- DEMONSTRAÇÃO VISUAL

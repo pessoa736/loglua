@@ -29,7 +29,9 @@ local config = {
     _sections = {},
     _defaultSection = "general",
     _lastShownIndex = 0,
-    _liveMode = false
+    _lastShownPrinted = false, -- se o índice foi atualizado por um show real
+    _liveMode = false,
+    _HandlerHeader = function() return "-=", 21 end
 }
 
 --============================================================================
@@ -42,6 +44,11 @@ local config = {
 function config.activateDebugMode()
     config._debugMode = true
 end
+
+function config.setHandlerHeader(func)
+    config._HandlerHeader = func
+end
+
 
 --- Desativa o modo debug
 -- Mensagens de debug serão ignoradas ao exibir/salvar
@@ -217,6 +224,7 @@ end
 function config.activateLiveMode()
     config._liveMode = true
     config._lastShownIndex = #config._messages
+    config._lastShownPrinted = false
 end
 
 --- Desativa o modo live

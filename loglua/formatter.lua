@@ -39,14 +39,14 @@ formatter.useColors = true
 -- SEPARADORES E CABEÇALHOS
 --============================================================================
 
---- Cria uma linha separadora decorativa
--- @function createSeparator
--- @tparam[opt="-="] string char Caractere ou padrão para repetir
--- @tparam[opt=21] number count Número de repetições
--- @treturn string Linha separadora
--- @usage
---   formatter.createSeparator()        -- "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
---   formatter.createSeparator("*", 10) -- "**********"
+---Cria uma linha separadora decorativa
+---@function createSeparator
+---@tparam[opt="-="] string char Caractere ou padrão para repetir
+---@tparam[opt=21] number count Número de repetições
+---@treturn string Linha separadora
+---@usage
+---  formatter.createSeparator()        -- "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+---  formatter.createSeparator("*", 10) -- "**********"
 function formatter.createSeparator(char, count)
     char = char or "-="
     count = count or 21
@@ -54,18 +54,25 @@ function formatter.createSeparator(char, count)
 end
 
 --- Cria o cabeçalho formatado do log com timestamp
--- @function createHeader
--- @treturn string Cabeçalho com linhas separadoras e data/hora
--- @usage
---   print(formatter.createHeader())
---   -- Saída:
---   -- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
---   -- --	Tue Nov 25 14:30:00 2025	--
---   -- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function formatter.createHeader()
-    local line = formatter.createSeparator()
+---@function createHeader
+---@treturn string Cabeçalho com linhas separadoras e data/hora
+---@usage
+---   print(formatter.createHeader())
+---   -- Saída:
+---   -- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+---   -- --	Tue Nov 25 14:30:00 2025	--
+---   -- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function formatter.createHeader(handlerHeader)
+    local char, count, text
+    if type(handlerHeader) == "function" then
+        char, count, text = handlerHeader()
+    else
+        -- Fallback padrão quando nenhum handler é fornecido
+        char, count, text = "-=", 21, nil
+    end
+    local line = formatter.createSeparator(char, count)
     local header = '\n' .. line .. "\n"
-    header = header .. "--\t" .. os.date() .. "\t--\n"
+    header = header .. "--\t" .. (text or os.date()) .. "\t--\n"
     header = header .. line .. "\n\n"
     return header
 end
@@ -113,12 +120,12 @@ end
 -- @tparam[opt] string section Nome da seção (nil para omitir)
 -- @treturn string Mensagem formatada com marcador de debug "__" e quebras de linha
 -- @usage
---   formatter.formatDebugMessage(1, "x = 42")           -- "[1]__\n x = 42\n"
---   formatter.formatDebugMessage(2, "y = 10", "parser") -- "[2][parser]__\n y = 10\n"
+--   formatter.formatDebugMessage(1, "x = 42")           -- "[1]\n__ x = 42\n"
+--   formatter.formatDebugMessage(2, "y = 10", "parser") -- "[2][parser]\n__ y = 10\n"
 function formatter.formatDebugMessage(index, message, section)
     local indexStr = type(index) == "string" and index or ("[" .. index .. "]")
     local sectionTag = section and ("[" .. section .. "]") or ""
-    return indexStr .. sectionTag .. "__\n" .. message .. "\n"
+    return indexStr .. sectionTag .. "\n__ " .. message .. "\n"
 end
 
 --============================================================================
@@ -129,11 +136,12 @@ end
 -- @function groupMessages
 -- @tparam table messages Lista de mensagens
 -- @tparam boolean debugMode Se modo debug está ativo
+-- @tparam[opt=0] number startOffset Índice inicial (usado para modo live para continuar a contagem)
 -- @treturn table Lista de grupos {startIdx, endIdx, section, messages, msgType}
-function formatter.groupMessages(messages, debugMode)
+function formatter.groupMessages(messages, debugMode, startOffset)
     local groups = {}
     local currentGroup = nil
-    local index = 0
+    local index = startOffset or 0
     
     for _, msg in ipairs(messages) do
         -- Verifica se deve incluir a mensagem
