@@ -23,3 +23,78 @@ Filtro: [network, database]
 [6][database]
 ////--error: Falha na query INSERT
 
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+--	Sun Dec 28 17:03:57 2025	--
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+Filtro: [network, database]
+
+[1][network]
+ Iniciando conexão com servidor
+
+[2][database]
+ Conectando ao banco de dados
+
+[3][network]
+ Conexão estabelecida
+
+[4][database]
+ Query SELECT executada
+
+[5][network]
+////--error: Timeout na requisição
+
+[6][database]
+////--error: Falha na query INSERT
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+--	Sun Dec 28 17:04:36 2025	--
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+Filtro: [network, database]
+
+[1][network]
+ Iniciando conexão com servidor
+
+[2][database]
+ Conectando ao banco de dados
+
+[3][network]
+ Conexão estabelecida
+
+[4][database]
+ Query SELECT executada
+
+[5][network]
+////--error: Timeout na requisição
+
+[6][database]
+////--error: Falha na query INSERT
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+--	Sun Dec 28 17:05:46 2025	--
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+Filtro: [network, database]
+
+[1][network]
+ Iniciando conexão com servidor
+
+[2][database]
+ Conectando ao banco de dados
+
+[3][network]
+ Conexão estabelecida
+
+[4][database]
+ Query SELECT executada
+
+[5][network]
+////--error: Timeout na requisição
+
+[6][database]
+////--error: Falha na query INSERT
+

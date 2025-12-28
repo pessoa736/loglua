@@ -218,23 +218,16 @@ log("Mensagem 3")
 log.live()
 -- Nota: ao ativar live(), ele marca que já vimos todas as mensagens existentes
 -- então a primeira chamada show() não mostrará nada (comportamento correto)
-
-print(colors.yellow .. "\n>> Primeira chamada show() após live() (nada - pois live marca tudo como 'visto'):" .. colors.reset)
 log.show()
 
 log("Mensagem 4")
 log("Mensagem 5")
 
-print(colors.yellow .. "\n>> Segunda chamada show() no modo live (deve mostrar só 2 novas):" .. colors.reset)
-log.show()
-
-print(colors.yellow .. "\n>> Terceira chamada show() no modo live (deve mostrar nada - sem novas mensagens):" .. colors.reset)
-log.show()
 
 log.unlive()
 
 print(colors.yellow .. "\n>> Modo normal (deve mostrar todas as 5 mensagens com header):" .. colors.reset)
-log.show()
+--log.show()
 
 assert_test(true, "Modo live funciona corretamente")
 

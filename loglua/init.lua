@@ -225,16 +225,42 @@ function log.show(filter)
     end
     
     -- Agrupa mensagens consecutivas da mesma seção
-    local groups = formatter.groupMessages(messages, config.isDebugMode())
+    local startOffset = 0
+    if isLive then
+        -- Começa no índice da última mensagem exibida
+        local lastIdx = config.getLastShownIndex()
+        startOffset = lastIdx
+
+        -- Se a primeira nova mensagem pertence à mesma seção/tipo da última mostrada,
+        -- tente estender a contagem voltando até o início daquele grupo anterior.
+        -- Se o último grupo impresso tem a mesma seção e tipo da primeira nova mensagem,
+        -- mantenha o início do grupo original para a continuação da contagem.
+        if #messages > 0 and lastIdx > 0 and config._lastShownPrinted then
+            if config._lastPrintedGroupSection == messages[1].section and config._lastPrintedGroupType == messages[1].type then
+                startOffset = config._lastPrintedGroupEnd or lastIdx
+            end
+        end
+    end
+    local groups = formatter.groupMessages(messages, config.isDebugMode(), startOffset)
     
     -- Exibe cada grupo formatado
     for _, group in ipairs(groups) do
         print(formatter.formatGroup(group))
     end
-    
+
+    -- Se estamos no modo live e imprimimos grupos, registre o último grupo impresso
+    if isLive and #groups > 0 then
+        local lastGroup = groups[#groups]
+        config._lastPrintedGroupStart = lastGroup.startIdx
+        config._lastPrintedGroupEnd = lastGroup.endIdx
+        config._lastPrintedGroupSection = lastGroup.section
+        config._lastPrintedGroupType = lastGroup.msgType
+    end
+
     -- Atualiza índice da última mensagem exibida (modo live)
     if isLive then
         config.setLastShownIndex(#config.getMessages())
+        config._lastShownPrinted = true
     else
         -- Exibe estatísticas apenas no modo normal
         print("\nTotal prints: ", #messages)
@@ -306,7 +332,7 @@ function log.save(logDirFile, name, filter)
     end
     
     -- Agrupa mensagens consecutivas da mesma seção
-    local groups = formatter.groupMessages(messages, config.isDebugMode())
+    local groups = formatter.groupMessages(messages, config.isDebugMode(), 0)
     
     -- Escreve cada grupo formatado
     for _, group in ipairs(groups) do

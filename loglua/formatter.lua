@@ -129,11 +129,12 @@ end
 -- @function groupMessages
 -- @tparam table messages Lista de mensagens
 -- @tparam boolean debugMode Se modo debug está ativo
+-- @tparam[opt=0] number startOffset Índice inicial (usado para modo live para continuar a contagem)
 -- @treturn table Lista de grupos {startIdx, endIdx, section, messages, msgType}
-function formatter.groupMessages(messages, debugMode)
+function formatter.groupMessages(messages, debugMode, startOffset)
     local groups = {}
     local currentGroup = nil
-    local index = 0
+    local index = startOffset or 0
     
     for _, msg in ipairs(messages) do
         -- Verifica se deve incluir a mensagem

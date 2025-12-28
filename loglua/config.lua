@@ -29,6 +29,7 @@ local config = {
     _sections = {},
     _defaultSection = "general",
     _lastShownIndex = 0,
+    _lastShownPrinted = false, -- se o índice foi atualizado por um show real
     _liveMode = false
 }
 
@@ -217,6 +218,7 @@ end
 function config.activateLiveMode()
     config._liveMode = true
     config._lastShownIndex = #config._messages
+    config._lastShownPrinted = false
 end
 
 --- Desativa o modo live
