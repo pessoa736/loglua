@@ -1,6 +1,6 @@
 rockspec_format = "3.0"
 package = "loglua"
-version = "1.5-1"
+version = "1.5-2"
 source = {
    url = "git+https://github.com/pessoa736/loglua.git",
    tag = "v1.5"
