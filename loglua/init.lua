@@ -5,7 +5,6 @@ local fileHandler   = require("loglua.file_handler")
 local helpModule    = require("loglua.help")
 
 --- Módulo principal de logging
----@type logluaLib 
 local log = {}
 log.__index = log
 log.__call = function (s, ...) s.add(...) end
