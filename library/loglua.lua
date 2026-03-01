@@ -364,14 +364,15 @@ log.getLanguage = function() end
 
 
 --- @type function help
---- @param topic? string Help topic ("sections", "live", "api")
+--- @param topic? string Help topic ("SectionSystem", "LiveMode", "CompleteAPI"; legacy: "sections", "live", "api")
 --- ***Show help about using LogLua***
 ---
 --- example:
 ---```lua
---- log.help()            -- general help
---- log.help("sections")  -- help about sections
---- log.help("api")       -- complete API list
+--- log.help()                   -- general help
+--- log.help("SectionSystem")    -- help about the section system
+--- log.help("CompleteAPI")      -- complete API list
+--- -- Legacy aliases (if enabled): "sections", "live", "api"
 ---```
 log.help = function(topic) end
 
