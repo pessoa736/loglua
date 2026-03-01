@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global, undefined-field
+
 --[[
     Run with: busted spec/loglua_spec.lua
 ]]
@@ -219,7 +221,7 @@ describe("LogLua", function()
             assert.equals(5, config.getMessageCount())
         end)
 
-        it("does NOT merge groups in live mode", function()
+        it("merges groups in live mode", function()
             log.live()
             
             log("first")
@@ -237,9 +239,9 @@ describe("LogLua", function()
             log("second")
             local s2 = config._lastPrintedGroupStart
             
-            -- In live mode, groups should not merge, so s2 should be > e1
-            assert.is_true(s2 == e1 + 1)
-            assert.is_true(s1 ~= s2)
+            -- In live mode, groups SHOULD merge, so s2 should remain s1
+            assert.equals(s1, s2)
+            assert.is_true(config._lastPrintedGroupEnd > e1)
             
             log.unlive()
         end)
@@ -270,6 +272,77 @@ describe("LogLua", function()
             f = io.open("test_multi.log", "r")
             assert.is_not_nil(f)
             if f then f:close() end
+        end)
+    end)
+
+    describe("Console Colors and Formatting", function()
+        it("enables and disables colors safely", function()
+            assert.is_true(log.hasColors())
+            log.disableColors()
+            assert.is_false(log.hasColors())
+            log.enableColors()
+            assert.is_true(log.hasColors())
+        end)
+
+        it("allows custom handler header function", function()
+            -- Modify header logic
+            log.setHandlerHeader(function()
+                return "=-", 10, "TEST"
+            end)
+            
+            -- Check state internals
+            local str, pad, title = config._HandlerHeader()
+            assert.equals("=-", str)
+            assert.equals(10, pad)
+            assert.equals("TEST", title)
+        end)
+    end)
+
+    describe("Filtering Features", function()
+        it("retrieves messages from single section", function()
+            log.add("general")
+            log.add("general 2")
+            log.add(log.section("network"), "net packet")
+            log.add(log.section("db"), "db payload")
+
+            local netMsgs = config.getMessagesBySection("network")
+            assert.equals(1, #netMsgs)
+            -- Substring match because formatArgs may add spaces context
+            assert.is_true(string.find(netMsgs[1].message, "net packet") ~= nil)
+        end)
+
+        it("retrieves messages from multiple sections", function()
+            log.add("general text")
+            log.add(log.section("network"), "connected")
+            log.add(log.section("db"), "started")
+            log.add(log.section("ui"), "rendered")
+
+            local multiMsgs = config.getMessagesBySections({"network", "db"})
+            assert.equals(2, #multiMsgs)
+            
+            local hasNetworkMsg = false
+            local hasDbMsg = false
+            
+            for _, m in ipairs(multiMsgs) do
+                if m.section == "network" then hasNetworkMsg = true end
+                if m.section == "db" then hasDbMsg = true end
+                assert.is_not_equal("ui", m.section)
+            end
+
+            assert.is_true(hasNetworkMsg)
+            assert.is_true(hasDbMsg)
+        end)
+    end)
+
+    describe("Help System", function()
+        it("displays help topics without throwing errors", function()
+            local ok = pcall(function()
+                log.help()
+                log.help("LiveMode")
+                log.help("SectionSystem")
+            end)
+            
+            assert.is_true(ok)
         end)
     end)
 end)

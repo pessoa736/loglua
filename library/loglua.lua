@@ -46,7 +46,10 @@ local log = {}
 
 log.__index = log
 
-log.__call = function () end
+
+---@param self logluaLib
+---@param ... any 
+log.__call = function (self, ...) end
 
 ---@type function
 ---@param self? logluaLib

@@ -37,6 +37,12 @@ formatter.useColors = true
 ---@return string separator The generated separator string
 ---
 ---***Creates a decorative separator line***
+---
+---example:
+---```lua
+---local sep = formatter.createSeparator("=-", 10)
+---print(sep) --> "=-=-=-=-=-=-=-=-=-=-"
+---```
 formatter.createSeparator = function(char, count) end
 
 ---@type function
@@ -44,6 +50,15 @@ formatter.createSeparator = function(char, count) end
 ---@return string header The complete formatted header string
 ---
 ---***Creates a formatted log header with timestamp***
+---
+---example:
+---```lua
+---local header = formatter.createHeader()
+---print(header)
+--- -- -=-=-=-=-=-=-=-=-=-=-
+--- -- title
+--- -- -=-=-=-=-=-=-=-=-=-=-
+---```
 formatter.createHeader = function(handlerHeader) end
 
 ---@type function
@@ -53,6 +68,12 @@ formatter.createHeader = function(handlerHeader) end
 ---@return string formatted The formatted message with newlines
 ---
 ---***Formats a standard log message***
+---
+---example:
+---```lua
+---local out = formatter.formatMessage(1, "Hello world", "general")
+---print(out) --> "[1][general]\n Hello world"
+---```
 formatter.formatMessage = function(index, message, section) end
 
 ---@type function
@@ -62,6 +83,12 @@ formatter.formatMessage = function(index, message, section) end
 ---@return string formatted The formatted debug message with "__" marker
 ---
 ---***Formats a debug message (with special prefix)***
+---
+---example:
+---```lua
+---local out = formatter.formatDebugMessage(3, "x = 42", "parser")
+---print(out) --> "__[3][parser]\n x = 42"
+---```
 formatter.formatDebugMessage = function(index, message, section) end
 
 ---@type function
@@ -71,6 +98,18 @@ formatter.formatDebugMessage = function(index, message, section) end
 ---@return table groups List of grouped message objects
 ---
 ---***Groups consecutive messages from the same section***
+---
+---example:
+---```lua
+---local msgs = {
+---    {type = "log", message = "msg1", section = "net"},
+---    {type = "log", message = "msg2", section = "net"},
+---    {type = "log", message = "msg3", section = "db"},
+---}
+---local groups = formatter.groupMessages(msgs, false, 0)
+--- -- groups[1] has msgs 1-2 (section "net")
+--- -- groups[2] has msg 3 (section "db")
+---```
 formatter.groupMessages = function(messages, debugMode, startOffset) end
 
 ---@type function
@@ -78,6 +117,19 @@ formatter.groupMessages = function(messages, debugMode, startOffset) end
 ---@return string formatted The formatted group string
 ---
 ---***Formats a group of messages***
+---
+---example:
+---```lua
+---local group = {
+---    startIdx = 1, endIdx = 2,
+---    section = "net", msgType = "log",
+---    messages = {"msg1", "msg2"}
+---}
+---print(formatter.formatGroup(group))
+--- -- [1-2][net]
+--- --  msg1
+--- --  msg2
+---```
 formatter.formatGroup = function(group) end
 
 ---@type function
@@ -85,12 +137,24 @@ formatter.formatGroup = function(group) end
 ---@return string message Concatenated arguments
 ---
 ---***Converts variadic arguments into a single string***
+---
+---example:
+---```lua
+---local s = formatter.argsToString("Value:", 42, true)
+---print(s) --> "Value: 42 true"
+---```
 formatter.argsToString = function(...) end
 
 ---@type function
 ---@return string prefix The error prefix string
 ---
 ---***Returns the prefix used for error messages***
+---
+---example:
+---```lua
+---local prefix = formatter.formatErrorPrefix()
+---print(prefix) --> "[!] "
+---```
 formatter.formatErrorPrefix = function() end
 
 return formatter

@@ -1,9 +1,9 @@
 rockspec_format = "3.0"
 package = "loglua"
-version = "1.6-1"
+version = "1.6-2"
 source = {
    url = "git+https://github.com/pessoa736/loglua.git",
-   tag = "v1.6-1"
+   tag = "v1.6-2"
 }
 description = {
    summary = "Minimalistic logging helper for Lua.",

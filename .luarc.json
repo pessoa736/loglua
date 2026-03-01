@@ -12,7 +12,7 @@
     "version": "Lua 5.4",
     "path": [
       "?.lua",
-      "loglua/init.lua",
+      "?/init.lua",
       "loglua/?.lua"
     ]
   },
