@@ -43,9 +43,9 @@ return  [[
 
 ❓ HELP
   log.help()                   Show this help
-  log.help("sections")         Help about sections
-  log.help("live")             Help about live mode
-  log.help("api")              Complete API list
+  log.help("SectionSystem")    Help about sections
+  log.help("LiveMode")         Help about live mode
+  log.help("CompleteAPI")      Complete API list
 
 
 More info: https://github.com/pessoa736/loglua
