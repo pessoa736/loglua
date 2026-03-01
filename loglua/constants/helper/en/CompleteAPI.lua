@@ -37,10 +37,10 @@ log.help([topic])               Show help
 ─────────────────────────────────────────────────────────────────
 
 HELP TOPICS
-  log.help()            General help
-  log.help("sections")  Section system
-  log.help("live")      Live mode (real-time)
-  log.help("api")       This list
+  log.help()                General help
+  log.help("SectionSystem") Section system
+  log.help("LiveMode")      Live mode (real-time)
+  log.help("CompleteAPI")   This list
 
 
 ]]
