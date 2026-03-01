@@ -18,18 +18,10 @@ A modular and minimalist logging system for Lua: collect messages in memory, org
 
 ## Installation
 
-### Via LuaRocks
-
 ```bash
 luarocks install loglua
 ```
 
-### Manually
-
-```lua
-package.path = "loglua/?.lua;" .. package.path
-local log = require("loglua")
-```
 
 ## Quick Start
 
