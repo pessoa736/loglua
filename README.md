@@ -43,7 +43,7 @@ log("App started", "v2.0")
 log("Loading configurations...")
 
 -- 2. Sections: Tag messages or create dedicated loggers
-log.section("network", "Connected to database")
+log.add(log.section("network"), "Connected to database")
 
 local dbLog = log.inSection("database")
 dbLog("Query executed successfully")
