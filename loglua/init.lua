@@ -176,7 +176,6 @@ log.isLive = config.isLiveMode
 --   log.show("network")               -- filtra por seção "network"
 --   log.show({"network", "database"}) -- filtra por múltiplas seções
 function log.show(filter)
-    -- Obtém mensagens baseado no modo (live ou normal)
     local messages
     local isLive = config.isLiveMode()
     
@@ -187,79 +186,129 @@ function log.show(filter)
         if #messages == 0 then
             return -- Nada novo pra mostrar
         end
-    else
-        -- Modo normal: pega todas as mensagens
-        print(formatter.createHeader(config._HandlerHeader))
         
+        -- Aplica filtro de seção
+        if filter then
+            local filtered = {}
+            local sectionLookup = {}
+            
+            if type(filter) == "string" then
+                sectionLookup[filter] = true
+            elseif type(filter) == "table" then
+                for _, s in ipairs(filter) do
+                    sectionLookup[s] = true
+                end
+            end
+            
+            for _, msg in ipairs(messages) do
+                if sectionLookup[msg.section] then
+                    table.insert(filtered, msg)
+                end
+            end
+            messages = filtered
+            
+            if #messages == 0 then
+                return -- Nada novo na seção filtrada
+            end
+        end
+    else
+        -- Modo normal: pega todas as mensagens (com filtro)
         if type(filter) == "string" then
             messages = config.getMessagesBySection(filter)
-            print("Filtro: [" .. filter .. "]\n")
         elseif type(filter) == "table" then
             messages = config.getMessagesBySections(filter)
-            print("Filtro: [" .. table.concat(filter, ", ") .. "]\n")
         else
             messages = config.getMessages()
         end
     end
     
-    -- Aplica filtro de seção se especificado (modo live também)
-    if isLive and filter then
-        local filtered = {}
-        local sectionLookup = {}
-        
-        if type(filter) == "string" then
-            sectionLookup[filter] = true
-        elseif type(filter) == "table" then
-            for _, s in ipairs(filter) do
-                sectionLookup[s] = true
-            end
-        end
-        
-        for _, msg in ipairs(messages) do
-            if sectionLookup[msg.section] then
-                table.insert(filtered, msg)
-            end
-        end
-        messages = filtered
-        
-        if #messages == 0 then
-            return -- Nada novo na seção filtrada
-        end
+    -- Header
+    if not isLive then
+        print(formatter.createHeader(config._HandlerHeader))
+    end
+    
+    -- Filtro label
+    if filter then
+        local filterText = type(filter) == "table" and table.concat(filter, ", ") or filter
+        print("Filtro: [" .. filterText .. "]\n")
     end
     
     -- Agrupa mensagens consecutivas da mesma seção
     local startOffset = 0
     if isLive then
-        -- Em modo live, não combinamos com o grupo anterior — mostramos apenas as novas mensagens
-        -- A contagem continua a partir do último índice exibido
         startOffset = config.getLastShownIndex()
     end
     local groups = formatter.groupMessages(messages, config.isDebugMode(), startOffset)
     
     -- Exibe cada grupo formatado
-    for _, group in ipairs(groups) do
-        print(formatter.formatGroup(group))
+    for i, group in ipairs(groups) do
+        local canMerge = false
+        local output = ""
+        
+        -- Verifica se podemos mesclar com o último grupo impresso no modo live
+        if isLive and i == 1 and config._lastShownPrinted then
+            if group.section == config._lastPrintedGroupSection and 
+               group.msgType == config._lastPrintedGroupType and
+               group.startIdx == config._lastPrintedGroupEnd + 1 then
+                   canMerge = true
+            end
+        end
+        
+        if canMerge then
+            -- Reconstrói o grupo completo (antigo + novo)
+            local allMessages = config.getMessages()
+            local mergedGroup = {
+                startIdx = config._lastPrintedGroupStart,
+                endIdx = group.endIdx,
+                section = group.section,
+                msgType = group.msgType,
+                messages = {}
+            }
+            
+            for idx = mergedGroup.startIdx, mergedGroup.endIdx do
+                table.insert(mergedGroup.messages, allMessages[idx].message)
+            end
+            
+            output = formatter.formatGroup(mergedGroup)
+            
+            -- Apaga saída anterior se possível
+            if config._lastPrintedLines and config._lastPrintedLines > 0 then
+                -- Move cursor para cima N linhas
+                io.write("\27[" .. config._lastPrintedLines .. "A")
+                -- Limpa da posição do cursor até o fim da tela
+                io.write("\27[J")
+            end
+            print(output)
+            
+            -- Atualiza variáveis de estado
+            config._lastPrintedGroupEnd = mergedGroup.endIdx
+        else
+            output = formatter.formatGroup(group)
+            print(output)
+            
+            if isLive then
+                config._lastPrintedGroupStart = group.startIdx
+                config._lastPrintedGroupEnd = group.endIdx
+                config._lastPrintedGroupSection = group.section
+                config._lastPrintedGroupType = group.msgType
+            end
+        end
+        
+        -- Atualiza contagem de linhas impressas (para poder apagar na próxima)
+        if isLive then
+            -- Conta quebras de linha na string formatada
+            local _, count = output:gsub("\n", "\n")
+            -- print() adiciona mais uma quebra de linha no final
+            -- formatGroup já termina com \n, então print adiciona uma linha em branco extra
+            config._lastPrintedLines = count + 1
+        end
     end
 
-    -- Se estamos no modo live e imprimimos grupos, registre o último grupo impresso
-    if isLive and #groups > 0 then
-        local lastGroup = groups[#groups]
-        config._lastPrintedGroupStart = lastGroup.startIdx
-        config._lastPrintedGroupEnd = lastGroup.endIdx
-        config._lastPrintedGroupSection = lastGroup.section
-        config._lastPrintedGroupType = lastGroup.msgType
-    end
-
-    -- Atualiza índice da última mensagem exibida (modo live)
-    if isLive then
-        config.setLastShownIndex(#config.getMessages())
-        config._lastShownPrinted = true
-    else
-        -- Exibe estatísticas apenas no modo normal
+    -- Stats (only in normal mode)
+    if not isLive then
         print("\nTotal prints: ", #messages)
         print("Total erros: ", config.getErrorCount())
         
-        -- Mostra seções disponíveis se não houver filtro
         if not filter then
             local sections = config.getSections()
             if #sections > 0 then
@@ -267,20 +316,18 @@ function log.show(filter)
             end
         end
         
-        -- Mostra dica de ajuda (só uma vez)
+        -- Dica de ajuda (só uma vez)
         if showHelpTip then
-            local lang = helpModule.getLanguage()
-            local tip
-            if lang == "en" then
-                tip = "💡 Tip: log.help() for help | log.setLanguage('pt'|'es') to change language"
-            elseif lang == "es" then
-                tip = "💡 Consejo: log.help() para ayuda | log.setLanguage('pt'|'en') para cambiar idioma"
-            else
-                tip = "💡 Dica: log.help() para ajuda | log.setLanguage('en'|'es') para mudar idioma"
-            end
+            local tip = "💡 Tip: log.help() for help"
             print("\n" .. tip)
             showHelpTip = false
         end
+    end
+
+    -- Atualiza índice da última mensagem exibida (modo live)
+    if isLive then
+        config.setLastShownIndex(#config.getMessages())
+        config._lastShownPrinted = true
     end
 end
 

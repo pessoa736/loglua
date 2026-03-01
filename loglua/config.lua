@@ -30,8 +30,13 @@ local config = {
     _defaultSection = "general",
     _lastShownIndex = 0,
     _lastShownPrinted = false, -- se o índice foi atualizado por um show real
+    _lastPrintedGroupStart = 0,
+    _lastPrintedGroupEnd = 0,
+    _lastPrintedGroupSection = nil,
+    _lastPrintedGroupType = nil,
+    _lastPrintedLines = 0,     -- número de linhas ocupadas pelo último grupo impresso
     _liveMode = false,
-    _HandlerHeader = function() return "-=", 21 end
+    _HandlerHeader = function() return "-=", 21, "title"  end
 }
 
 --============================================================================

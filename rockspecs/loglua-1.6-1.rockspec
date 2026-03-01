@@ -6,12 +6,12 @@ source = {
    tag = "v1.6-1"
 }
 description = {
-   summary = "Minimalistic logging helper for Lua with multi-language support.",
+   summary = "Minimalistic logging helper for Lua.",
    detailed = [[
 loglua is a tiny helper to collect messages in-memory and either print them or
 append them to a file. Features include: multiple values per log, sections/categories,
 automatic grouping, live mode for real-time monitoring, ANSI colors for errors/debug,
-section filters, file saving with timestamps, and multi-language help (pt/en/es).
+section filters, and file saving with timestamps.
 	]],
    homepage = "https://github.com/pessoa736/loglua",
    license = "MIT",
@@ -19,6 +19,12 @@ section filters, file saving with timestamps, and multi-language help (pt/en/es)
 }
 dependencies = {
    "lua >= 5.4"
+}
+test_dependencies = {
+   "busted"
+}
+test = {
+   type = "busted"
 }
 build = {
    type = "builtin",
